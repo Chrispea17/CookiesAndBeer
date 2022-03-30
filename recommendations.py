@@ -1,5 +1,7 @@
-class recommendation:
+class Recommendation:
     def ranking(response):
-        response_boolean = {"good": True}
-        if response_boolean[response] == True:
+        rankings = {"good": True, "bad": False}
+        if rankings[response] == True:
             return 1
+        elif rankings[response] == False:
+            return 0
