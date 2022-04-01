@@ -1,21 +1,31 @@
 from pyparsing import null_debug_action
-from recommendations import Rating, Recommendation
+from recommendations import Recommendation
 import pytest
 
+# def test_ability_to_give_a_recommendation_a_positive_rating():
+#     rank = Recommendation.rating("bad")
+#     assert rank == 1
+# changed to a more accurate name for the test
+# def test_ability_to_give_a_recommendation_a_positive_rating():
 
-def test_ability_to_give_a_recommendation_a_positive_rating():
-    rank = Rating.rateObject(1, "good")
-    assert rank == 1
+def test_positive_rating_equals_one():
+    recommendation = Recommendation(1, 25, 1, "howdy.com")
+    recommendation._recommendationRating = recommendation.setRating("good")
+    assert recommendation._recommendationRating == 1
+
+
+# def test_ability_to_give_recommendation_a_positive_rating():
+#     rant = Recommendation.
 
 
 def test_ability_to_give_a_recommendation_a_negative_rating():
-    rank = Rating.rateObject(1, "bad")
+    rank = Recommendation.rating("bad")
     assert rank == 0
 
 
 def test_null_rating_not_possible():
     with pytest.raises(Exception):
-        Rating.rateObject(1, "any") == 1
+        Recommendation.rating() == 1
 
 
 def test_this_is_a_recommendation_with_correct_data_types():
@@ -42,8 +52,12 @@ def test_this_is_a_recommendation_with_correct_data():
 #     assert recommendation.itemID == 4
 #     assert recommendation.findItem == "www.findyouritem.com"
 
-
-def test_user_gives_recommendation_a_rating():
-    recommendation = Recommendation(1, 25, 1, "bestcookiesever.com")
-    iD = recommendation.recommendationID
-    rating = Rating("")
+# this is the first time we are testing a repository
+def test_count_all_recommendations_given_by_User2_to_User1():
+    recommendation1 = Recommendation(25, 14, 1, "www.findyourfirstitem.com")
+    recommendation2 = Recommendation(26, 14, 2, "www.findyourseconditem.com")
+    recommendation3 = Recommendation(27, 14, 3, "www.findyourthirditem.com")
+    recommendation4 = Recommendation(28, 14, 4, "www.findyourfourthitem.com")
+    recommendation5 = Recommendation(29, 14, 5, "www.findyourfifthitem.com")
+    countRecommendations = Recommendation.counter(14)
+    assert countRecommendations == 5
