@@ -26,19 +26,27 @@ class Rank:
     # Note SHOULD PROBABLY DECOUPLE COUNT AND RANK IN UPDATE#
     # counts # of Recommendations
     def countforRank(self, data, uniqueusermatch):
-        self._count = None
+        self._count = 0
         for item in data:
             if (
                 item.uniqueUserMatchID == uniqueusermatch
                 and item._recommendationRating != None
             ):
                 self._count += 1
+        if self._count == 0:
+            self._count = None
 
-    def sumForRank(self, data, uniqueusermatch):
-        self._count = 0
+    def sumforRank(self, data, uniqueusermatch):
+        self._sum = 0
         for item in data:
-            if item.uniqueUserMatchID == uniqueusermatch:
-                self._count += 1
+            if (
+                item.uniqueUserMatchID == uniqueusermatch
+                and item._recommendationRating != None
+                and item._recommendationRating == 1
+            ):
+                self._sum += 1
+            if self._sum == 0:
+                self._sum = None
 
     def setRank(self, sumratings: int, recommendationCount: int) -> float:
         self._rank = sumratings / recommendationCount

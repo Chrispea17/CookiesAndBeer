@@ -1,4 +1,3 @@
-from pyparsing import null_debug_action
 from recommendations import Rank, Recommendation
 import pytest
 
@@ -46,60 +45,48 @@ def test_calculate_rank():
     assert score._rank == 0.75
 
 
+# I've got no where to put this because I don't have UniqueUserMatchIDs to assign the Count to
 def test_calculate_recommendation_count():
-    recList = [
-        Recommendation(1, 5, 6, "garbageinput.com"),
-        Recommendation(2, 6, 6, "garbageinput.com"),
-        Recommendation(3, 5, 6, "garbageinput.com"),
-        Recommendation(4, 5, 6, "garbageinput.com"),
-        Recommendation(5, 5, 6, "garbageinput.com")
-    ]
-    setrating = [
-        "good","bad", None, None, "good","good"
-    ]
-    for item in range(0,len(recList)-1):
-        recList[item].setRating(setRating[item])
+    rec1 = Recommendation(1, 5, 6, "garbageinput.com")
+    rec1.setRating("good")
+    rec2 = Recommendation(2, 6, 6, "garbageinput.com")
+    print(rec2._recommendationRating)
+    rec3 = Recommendation(3, 5, 6, "garbageinput.com")
+    rec3.setRating("bad")
+    rec4 = Recommendation(4, 5, 6, "garbageinput.com")
+    rec4.setRating("good")
+    rec5 = Recommendation(5, 5, 6, "garbageinput.com")
+    ratings = [rec1, rec2, rec3, rec4, rec5]
+
     counter = Rank()
-    counter.countforRank(recList, 5)
-    assert counter._count == 0
-    counter.countforRank(recList, 6)
+    counter.countforRank(ratings, 5)
+    assert counter._count == 3
+    counter.countforRank(ratings, 6)
     assert counter._count == None
-    counter.countforRank(recList, 10)
+    counter.countforRank(ratings, 10)
     assert counter._count == None
 
-# def test_calculate_recommendation_sum():
-#     recList = [
-#         Recommendation(1, 5, 6, "garbageinput.com").setRating("good"),
-#         Recommendation(2, 6, 6, "garbageinput.com").setRating("good"),
-#         Recommendation(3, 5, 6, "garbageinput.com").setRating("bad"),
-#         Recommendation(4, 5, 6, "garbageinput.com").setRating("good"),
-#         Recommendation(5, 5, 6, "garbageinput.com").setRating("bad")
 
-#     ]
-#     counter = Rank()
-#     counter.countforRank(recList, 5)
-#     assert counter._count == 4
-#     counter.countforRank(recList, 6)
-#     assert counter._count == 1
-#     counter.countforRank(recList, 10)
-#     assert counter._count == 0
+def test_calculate_recommendation_count():
+    rec1 = Recommendation(1, 5, 6, "garbageinput.com")
+    rec1.setRating("good")
+    rec2 = Recommendation(2, 6, 6, "garbageinput.com")
+    print(rec2._recommendationRating)
+    rec3 = Recommendation(3, 5, 6, "garbageinput.com")
+    rec3.setRating("bad")
+    rec4 = Recommendation(4, 5, 6, "garbageinput.com")
+    rec4.setRating("good")
+    rec5 = Recommendation(5, 5, 6, "garbageinput.com")
+    ratings = [rec1, rec2, rec3, rec4, rec5]
 
-#     def test_calculate_unranked_sum():
-#         recList = [
-#         Recommendation(1, 5, 6, "garbageinput.com").setRating("good"),
-#         Recommendation(2, 6, 6, "garbageinput.com").setRating("good"),
-#         Recommendation(3, 5, 6, "garbageinput.com").setRating("bad"),
-#         Recommendation(4, 5, 6, "garbageinput.com").setRating("good"),
-#         Recommendation(5, 5, 6, "garbageinput.com")
+    counter = Rank()
+    counter.sumforRank(ratings, 5)
+    assert counter._sum == 2
+    counter.sumforRank(ratings, 6)
+    assert counter._sum == None
+    counter.sumforRank(ratings, 10)
+    assert counter._sum == None
 
-#     ]
-#         counter = Rank()
-#         counter.countforRank(recList, 5)
-#         assert counter._count == 4
-#         counter.countforRank(recList, 6)
-#         assert counter._count == 1
-#         counter.countforRank(recList, 10)
-#         assert counter._count == 0
 
 # didn't like the way this worked so took rating out of the initializer
 # def test_this_is_a_recommendation_with_no_rating():
