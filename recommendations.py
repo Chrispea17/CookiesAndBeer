@@ -52,6 +52,20 @@ class Rank:
         self._rank = sumratings / recommendationCount
 
 
+class MatchUsers:
+    def __init__(self, id: int, RequesterID: int, RecommenderID: int):
+        self.id = id
+        self.requester = str(RequesterID)
+        self.recommender = str(RecommenderID)
+        self.seq: str = self.requester + "-" + self.recommender
+
+    def getRecommender(self):
+        return int(self.recommender)
+
+    def getRequester(self):
+        return int(self.requester)
+
+
 ###NOTE need unranked people to show somewhere###
 # counts the number of recommendations from one user to another using the uniqueUserMatchID this is the first time we are looking for a psuedo repository
 # def counter(ID):

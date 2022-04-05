@@ -1,4 +1,5 @@
-from recommendations import Rank, Recommendation
+from urllib import request
+from recommendations import Rank, Recommendation, MatchUsers
 import pytest
 
 
@@ -88,6 +89,21 @@ def test_calculate_recommendation_count():
     assert counter._sum == None
 
 
+def test_calculate_unique_user_match_seq():
+    UserID1 = 11
+    UserID2 = 12
+    matchSequence = MatchUsers(1,UserID1, UserID2)
+    assert matchSequence.seq == "11-12"
+    matchSequence2 = MatchUsers(2,UserID2, UserID1)
+    assert matchSequence2.seq == "12-11"
+
+def test_get_recommender_user_id_from_recommendation():
+    recommendation = Recommendation(5, 2, 6, "garbageinput.com")
+    matchID = MatchUsers(recommendation.uniqueUserMatchID, 13, 14)
+    recommender = matchID.getRecommender()
+    assert recommender == 14
+    requester = matchID.getRequester()
+    assert requester == 13
 # didn't like the way this worked so took rating out of the initializer
 # def test_this_is_a_recommendation_with_no_rating():
 #     recommendation = Recommendation(25, 14, 4, "www.findyouritem.com")
