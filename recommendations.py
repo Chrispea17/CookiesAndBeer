@@ -48,8 +48,18 @@ class Rank:
             if self._sum == 0:
                 self._sum = None
 
-    def setRank(self, sumratings: int, recommendationCount: int) -> float:
-        self._rank = sumratings / recommendationCount
+    def setRank(self, data, uniqueusermatch) -> float:
+        self.sumforRank(data,uniqueusermatch)
+        self.countforRank(data,uniqueusermatch)
+        print(self._sum)
+        print(self._count)
+        self._rank = self._sum / self._count
+    
+
+
+
+
+
 
 
 class MatchUsers:
