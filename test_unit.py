@@ -1,4 +1,3 @@
-from urllib import request
 from recommendations import Rank, Recommendation, MatchUsers
 # from sqlalchemy.orm import mapper, relationship
 import pytest
@@ -16,12 +15,12 @@ def test_negative_rating_equals_zero():
     assert recommendation._recommendationRating == 0
 
 
-def test_null_rating_not_possible():
+def test_other_rating_not_possible():
     with pytest.raises(Exception):
         recommendation = Recommendation(1, 6, 6, "garbageinput.com")
         recommendation.setRating("garbage-in")
         assert recommendation._recommendationRating == 1
-
+        assert recommendation._recommendationRating == 0
 
 def test_this_is_a_recommendation_with_correct_data_types():
     recommendation = Recommendation(25, 14, 1, "www.findyouritem.com")
@@ -45,7 +44,7 @@ def test_this_is_a_recommendation_with_correct_data():
 #     score = Rank()
 #     score.setRank(sumofratings, recommendationCount)
 #     assert score._rank == 0.75
-#refactor
+# refactored
 
 def test_calculate_rank():
     rec1 = Recommendation(1, 5, 6, "garbageinput.com")
@@ -59,7 +58,7 @@ def test_calculate_rank():
     ratings = [rec1, rec2, rec3, rec4, rec5]
 
     counter = Rank()
-    counter.setRank(ratings, 5)
+    counter.getRank(ratings, 5)
     assert counter._rank == 2/3
     # counter.countforRank(ratings, 6)
     # assert counter._count == None
@@ -88,11 +87,10 @@ def test_calculate_recommendation_count():
     assert counter._count == None
 
 
-def test_calculate_recommendation_count():
+def test_calculate_recommendation_sum():
     rec1 = Recommendation(1, 5, 6, "garbageinput.com")
     rec1.setRating("good")
     rec2 = Recommendation(2, 6, 6, "garbageinput.com")
-    print(rec2._recommendationRating)
     rec3 = Recommendation(3, 5, 6, "garbageinput.com")
     rec3.setRating("bad")
     rec4 = Recommendation(4, 5, 6, "garbageinput.com")
@@ -108,35 +106,38 @@ def test_calculate_recommendation_count():
     counter.sumforRank(ratings, 10)
     assert counter._sum == None
 
+def test_assign_rank_to_unique_user_match_id():
+    rec1 = Recommendation(1, 5, 6, "garbageinput.com")
+    rec1.setRating("good")
+    rec2 = Recommendation(2, 6, 6, "garbageinput.com")
+    rec3 = Recommendation(3, 5, 6, "garbageinput.com")
+    rec3.setRating("bad")
+    rec4 = Recommendation(4, 5, 6, "garbageinput.com")
+    rec4.setRating("good")
+    rec5 = Recommendation(5, 5, 6, "garbageinput.com")
+    ratings = [rec1, rec2, rec3, rec4, rec5]
 
-# def test_calculate_rank():
-#     rec1 = Recommendation(1, 5, 6, "garbageinput.com")
-#     rec1.setRating("good")
-#     rec2 = Recommendation(2, 6, 6, "garbageinput.com")
-#     print(rec2._recommendationRating)
-#     rec3 = Recommendation(3, 5, 6, "garbageinput.com")
-#     rec3.setRating("bad")
-#     rec4 = Recommendation(4, 5, 6, "garbageinput.com")
-#     rec4.setRating("good")
-#     rec5 = Recommendation(5, 5, 6, "garbageinput.com")
-#     ratings = [rec1, rec2, rec3, rec4, rec5]
-
-#     counter = Rank()
-#     counter.getRank(ratings, 5)
-#     assert counter._rank == 0.5
-    # counter.getRank(ratings, 6)
-    # assert counter._rank == None
-    # counter.getRank(ratings, 10)
-    # assert counter._rank == None
+    
 
 
-def test_calculate_unique_user_match_seq():
-    UserID1 = 11
-    UserID2 = 12
-    matchSequence = MatchUsers(1, UserID1, UserID2)
-    assert matchSequence.seq == "11-12"
-    matchSequence2 = MatchUsers(2, UserID2, UserID1)
-    assert matchSequence2.seq == "12-11"
+
+# don't need this
+# def test_calculate_unique_user_match_seq():
+#     UserID1 = 11
+#     UserID2 = 12
+#     matchSequence = MatchUsers(1, UserID1, UserID2)
+#     assert matchSequence.seq == "11-12"
+#     matchSequence2 = MatchUsers(2, UserID2, UserID1)
+#     assert matchSequence2.seq == "12-11"
+
+# I don't need this yet
+# def test_matchUsersID_iterates_one_above_previous():
+#     UserID1 = 11
+#     UserID2 = 12
+#     matchSequence = MatchUsers(1, UserID1, UserID2)
+#     assert matchSequence.seq == "11-12"
+#     matchSequence2 = MatchUsers(2, UserID2, UserID1)
+#     assert matchSequence2.seq == "12-11"
 
 
 def test_get_recommender_or_requester_user_id_from_recommendation():
@@ -147,6 +148,16 @@ def test_get_recommender_or_requester_user_id_from_recommendation():
     requester = matchID.getRequester()
     assert requester == 13
 
+def test_rank_relavent_recommendations():
+    rec1 = Recommendation(1, 5, 6, "garbageinput1.com")
+
+    rec2 = Recommendation(2, 6, 6, "garbageinput2.com")
+    rec3 = Recommendation(3, 5, 6, "garbageinput3.com")
+    rec4 = Recommendation(4, 10, 6, "garbageinput4.com")
+    rec5 = Recommendation(5, 1, 6, "garbageinput5.com")
+    viewList = 4
+
+#def test_requester_tries_out_recommendation():
 
 # didn't like the way this worked so took rating out of the initializer
 # def test_this_is_a_recommendation_with_no_rating():

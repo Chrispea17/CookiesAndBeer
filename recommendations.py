@@ -1,5 +1,15 @@
 from numbers import Real
+from dataclasses import dataclass
 
+@dataclass(frozen=True)
+class Item:
+    itemID: str #for now, I'm not sure why this wouldn't end up being an iterated iteger?
+    itemName: str
+
+@dataclass(frozen=True)
+class User:
+    userID: str
+    userName: str #if username is changes we expect userid to change too i.e."cannot change username, please make new account"
 
 class Recommendation:
     def __init__(self, id: int, matchid: int, itemID: int, url: str):
@@ -48,27 +58,17 @@ class Rank:
             if self._sum == 0:
                 self._sum = None
 
-    def setRank(self, data, uniqueusermatch) -> float:
+    def getRank(self, data, uniqueusermatch) -> float:
         self.sumforRank(data,uniqueusermatch)
         self.countforRank(data,uniqueusermatch)
-        print(self._sum)
-        print(self._count)
         self._rank = self._sum / self._count
-    
-
-
-
-
-
-
 
 class MatchUsers:
     def __init__(self, id: int, RequesterID: int, RecommenderID: int):
         self.id = id
         self.requester = str(RequesterID)
         self.recommender = str(RecommenderID)
-        self.seq: str = self.requester + "-" + self.recommender
-
+        
     def getRecommender(self):
         return int(self.recommender)
 
@@ -81,3 +81,5 @@ class MatchUsers:
 # def counter(ID):
 #     countRecs = []
 #     for (self.recommendationID = ID)
+
+
