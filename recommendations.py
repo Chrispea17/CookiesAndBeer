@@ -93,7 +93,7 @@ class MatchUsers:
         return int(self.requester)
 
 
-class Lists:
+class Outputs:
     def __init__(self) -> None:
         self._recommendersList = []
         self._rankedList = []
@@ -118,9 +118,7 @@ class Lists:
                                 rankedList.append(
                                     (
                                         [
-                                            recommender.get_user_from_id(
-                                                recommender.userID
-                                            ),
+                                            recommender.get_user_from_id(recommender.userID),
                                             recommendation.itemID,
                                             recommendation.findItem,
                                         ],

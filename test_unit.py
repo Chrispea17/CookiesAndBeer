@@ -1,4 +1,4 @@
-from recommendations import Rank, Recommendation, MatchUsers, User, Item, Lists
+from recommendations import Outputs, Rank, Recommendation, MatchUsers, User, Item, Outputs
 
 # from sqlalchemy.orm import mapper, relationship
 import pytest
@@ -136,9 +136,51 @@ def test_list_recommender_users():
     match5 = MatchUsers(rec5.uniqueUserMatchID, 1, 16)
     recommendations = [rec1, rec2, rec3, rec4, rec5]
     matches = [match1, match2, match3, match4, match5]
-    listRecommenders = Lists()
+    listRecommenders = Outputs()
     listRecommenders.get_recommenders_with_itemID(recommendations, matches, 6)
     assert listRecommenders._recommendersList == {12, 13, 14, 15}
+
+
+def test_order_recommender_list_by_Rank():
+    item = Item(6, "pizza")
+    item2 = Item(7, "marshmallows")
+    rec1 = Recommendation(1, 5, 6, "placetogetpizza.com")
+    match1 = MatchUsers(rec1.uniqueUserMatchID, 1, 12)
+    recommender1 = User(12, "AbbyEats")
+    match1._rank = 0.5
+    rec2 = Recommendation(2, 6, 6, "yourmom.com")
+    match2 = MatchUsers(rec2.uniqueUserMatchID, 1, 13)
+    recommender2 = User(13, "JoeHatesPizza")
+    match2._rank = 0.4
+    rec3 = Recommendation(3, 7, 6, "mymom.com")
+    match3 = MatchUsers(rec3.uniqueUserMatchID, 1, 14)
+    recommender3 = User(14, "YinaEatsBeanas")
+    match3._rank = 0.77
+    rec4 = Recommendation(4, 10, 6, "homemade.com")
+    match4 = MatchUsers(rec4.uniqueUserMatchID, 1, 15)
+    recommender4 = User(15, "MyNameSucks")
+    match4._rank = 0.25
+    rec5 = Recommendation(5, 1, 7, "notpizza.com")
+    match5 = MatchUsers(rec5.uniqueUserMatchID, 1, 16)
+    recommender5 = User(16, "AnOldUser")
+    match5._rank = 0
+    recommenders = [
+        recommender1,
+        recommender2,
+        recommender3,
+        recommender4,
+        recommender5,
+    ]
+    recommendations = [rec1, rec2, rec3, rec4, rec5]
+    matches = [match1, match2, match3, match4, match5]
+    list = Outputs()
+    list.get_ranked_recommendations(recommenders, recommendations, matches, item.itemID)
+    assert list._rankedList == [
+        ["YinaEatsBeanas", 6, "mymom.com"],
+        ["AbbyEats", 6, "placetogetpizza.com"],
+        ["JoeHatesPizza", 6, "yourmom.com"],
+        ["MyNameSucks", 6, "homemade.com"],
+    ]
 
 
 """
