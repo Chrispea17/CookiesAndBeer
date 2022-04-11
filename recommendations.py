@@ -1,15 +1,27 @@
 from numbers import Real
 from dataclasses import dataclass
+from abc import ABC, abstractmethod, abstractproperty
 
-@dataclass(frozen=True)
+@dataclass
 class Item:
-    itemID: str #for now, I'm not sure why this wouldn't end up being an iterated iteger?
-    itemName: str
+    def __init__(self, id : str, item : str):
+        self.itemID: str = id #for now, I'm not sure why this wouldn't end up being an iterated iteger?
+        self.itemName: str= item
+        
+    def get_item_from_id(self,id):
+        if(self.itemID==id):
+            return self.itemName
 
-@dataclass(frozen=True)
+@dataclass
 class User:
-    userID: str
-    userName: str #if username is changes we expect userid to change too i.e."cannot change username, please make new account"
+    def __init__(self, id: str, Name: str):
+        self.userID: str = id
+        self.userName: str = Name #if username is changes we expect userid to change too i.e."cannot change username, please make new account"
+
+    def get_user_from_id(self,id):
+        if(self.userID==id):
+            return self.userName
+
 
 class Recommendation:
     def __init__(self, id: int, matchid: int, itemID: int, url: str):
@@ -69,10 +81,11 @@ class MatchUsers:
         self.requester = str(RequesterID)
         self.recommender = str(RecommenderID)
         
-    def getRecommender(self):
-        return int(self.recommender)
+    def getRecommender(self, id):
+        if (id == self.id):
+            return int(self.recommender)
 
-    def getRequester(self):
+    def getRequester(self, id):
         return int(self.requester)
 
 

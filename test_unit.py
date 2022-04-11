@@ -1,4 +1,4 @@
-from recommendations import Rank, Recommendation, MatchUsers
+from recommendations import Rank, Recommendation, MatchUsers, User, Item
 # from sqlalchemy.orm import mapper, relationship
 import pytest
 
@@ -140,40 +140,41 @@ def test_assign_rank_to_unique_user_match_id():
 #     assert matchSequence2.seq == "12-11"
 
 
-def test_get_recommender_or_requester_user_id_from_recommendation():
-    recommendation = Recommendation(5, 2, 6, "garbageinput.com")
-    matchID = MatchUsers(recommendation.uniqueUserMatchID, 13, 14)
-    recommender = matchID.getRecommender()
-    assert recommender == 14
-    requester = matchID.getRequester()
-    assert requester == 13
+# def test_get_recommender_or_requester_user_id_from_recommendation():
+#     recommendation = Recommendation(5, 2, 6, "garbageinput.com")
+#     matchID = MatchUsers(recommendation.uniqueUserMatchID, 13, 14)
+#     recommender = matchID.getRecommender()
+#     assert recommender == 14
+#     requester = matchID.getRequester()
+#     assert requester == 13
 
-def test_rank_relavent_recommendations():
-    rec1 = Recommendation(1, 5, 6, "garbageinput1.com")
+# def test_list_recommender_users():
+#     rec1 = Recommendation(1, 5, 6, "garbageinput1.com")
+#     requester = UserID
+#     rec2 = Recommendation(2, 6, 6, "garbageinput2.com")
+#     rec3 = Recommendation(3, 5, 6, "garbageinput3.com")
+#     rec4 = Recommendation(4, 10, 6, "garbageinput4.com")
+#     rec5 = Recommendation(5, 1, 6, "garbageinput5.com")
+#     viewList = (requesterID,)
 
-    rec2 = Recommendation(2, 6, 6, "garbageinput2.com")
-    rec3 = Recommendation(3, 5, 6, "garbageinput3.com")
-    rec4 = Recommendation(4, 10, 6, "garbageinput4.com")
-    rec5 = Recommendation(5, 1, 6, "garbageinput5.com")
-    viewList = 4
+"""
+User tests
 
-#def test_requester_tries_out_recommendation():
+"""
+def test_get_user_from_input():
+    user = User('5','BettyRec')
+    assert user.userID == '5'
+    assert isinstance(user, User)
 
-# didn't like the way this worked so took rating out of the initializer
-# def test_this_is_a_recommendation_with_no_rating():
-#     recommendation = Recommendation(25, 14, 4, "www.findyouritem.com")
-#     assert recommendation.recommendationID == 25
-#     assert recommendation.uniqueUserMatchID == 14
-#     assert recommendation.itemID == 4
-#     assert recommendation.findItem == "www.findyouritem.com"
+def test_item_user_from_input():
+    item = Item('1','Cookies')
+    assert item.itemID == '1'
+    assert isinstance(item, Item)
 
-# this is the first time we are testing a repository
-# def test_store_recommendations():
-# def test_count_all_recommendations_given_by_User2_to_User1():
-#     recommendation1 = Recommendation(25, 14, 1, "www.findyourfirstitem.com")
-#     recommendation2 = Recommendation(26, 14, 2, "www.findyourseconditem.com")
-#     recommendation3 = Recommendation(27, 14, 3, "www.findyourthirditem.com")
-#     recommendation4 = Recommendation(28, 14, 4, "www.findyourfourthitem.com")
-#     recommendation5 = Recommendation(29, 14, 5, "www.findyourfifthitem.com")
-#     countRecommendations = Recommendation.counter(14)
-#     assert countRecommendations == 5
+def test_get_user_from_id():
+    user = User('5','BettyRec')
+    user.get_user_from_id('5') == 'BettyRec'
+
+def test_get_item_from_id():
+    user = Item('1','Cookies')
+    user.get_item_from_id('1') == 'Cookies'
