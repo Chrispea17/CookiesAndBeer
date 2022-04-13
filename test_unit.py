@@ -25,19 +25,22 @@ def test_other_rating_not_possible():
 
 
 def test_this_is_a_recommendation_with_correct_data_types():
-    recommendation = Recommendation(25, 14, 1, "www.findyouritem.com")
-    assert type(recommendation.recommendationID) == int
-    assert type(recommendation.uniqueUserMatchID) == int
-    assert type(recommendation.itemID) == int
+    recommendation = Recommendation(
+        "7-15-2022", "Jean-Joe", "cookies", "www.findyouritem.com")
+    assert type(recommendation.date) == str
+    assert type(recommendation.uniqueUserMatchID) == str
+    assert type(recommendation.itemID) == str
     assert type(recommendation.findItem) == str
 
 
 def test_this_is_a_recommendation_with_correct_data():
-    recommendation = Recommendation(25, 14, 1, "www.findyouritem.com")
-    assert recommendation.recommendationID == 25
-    assert recommendation.uniqueUserMatchID == 14
-    assert recommendation.itemID == 1
+    recommendation = Recommendation(
+        "Shell-Silver", "cookies", "www.findyouritem.com", "7-25-2020")
+    assert recommendation.date == "7-25-2020"
+    assert recommendation.uniqueUserMatchID == "Shell-Silver"
+    assert recommendation.itemID == "cookies"
     assert recommendation.findItem == "www.findyouritem.com"
+    assert isinstance(recommendation, Recommendation)
 
 
 # def test_calculate_rank():
@@ -50,14 +53,14 @@ def test_this_is_a_recommendation_with_correct_data():
 
 
 def test_calculate_rank():
-    rec1 = Recommendation(1, 5, 6, "garbageinput.com")
+    rec1 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
     rec1.setRating("good")
-    rec2 = Recommendation(2, 6, 6, "garbageinput.com")
-    rec3 = Recommendation(3, 5, 6, "garbageinput.com")
+    rec2 = Recommendation(6, 7, "garbageinput.com","8-2-2022")
+    rec3 = Recommendation(5, 8, "g2.com","8-2-2022")
     rec3.setRating("bad")
-    rec4 = Recommendation(4, 5, 6, "garbageinput.com")
+    rec4 = Recommendation(5, 9, "garbageinput.com","8-2-2022")
     rec4.setRating("good")
-    rec5 = Recommendation(5, 5, 6, "garbageinput.com")
+    rec5 = Recommendation(5, 10, "garbageinput.com","8-2-2022")
     ratings = [rec1, rec2, rec3, rec4, rec5]
 
     counter = Rank()
@@ -71,15 +74,14 @@ def test_calculate_rank():
 
 # I've got no where to put this because I don't have UniqueUserMatchIDs to assign the Count to
 def test_calculate_recommendation_count():
-    rec1 = Recommendation(1, 5, 6, "garbageinput.com")
+    rec1 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
     rec1.setRating("good")
-    rec2 = Recommendation(2, 6, 6, "garbageinput.com")
-    print(rec2._recommendationRating)
-    rec3 = Recommendation(3, 5, 6, "garbageinput.com")
+    rec2 = Recommendation(6, 6, "garbageinput.com","8-2-2022")
+    rec3 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
     rec3.setRating("bad")
-    rec4 = Recommendation(4, 5, 6, "garbageinput.com")
+    rec4 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
     rec4.setRating("good")
-    rec5 = Recommendation(5, 5, 6, "garbageinput.com")
+    rec5 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
     ratings = [rec1, rec2, rec3, rec4, rec5]
 
     counter = Rank()
@@ -92,14 +94,14 @@ def test_calculate_recommendation_count():
 
 
 def test_calculate_recommendation_sum():
-    rec1 = Recommendation(1, 5, 6, "garbageinput.com")
+    rec1 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
     rec1.setRating("good")
-    rec2 = Recommendation(2, 6, 6, "garbageinput.com")
-    rec3 = Recommendation(3, 5, 4, "garbageinput.com")
+    rec2 = Recommendation(6, 6, "garbageinput.com","8-2-2022")
+    rec3 = Recommendation(5, 4, "garbageinput.com","8-2-2022")
     rec3.setRating("bad")
-    rec4 = Recommendation(4, 5, 3, "garbageinput.com")
+    rec4 = Recommendation(5, 3, "garbageinput.com","8-2-2022")
     rec4.setRating("good")
-    rec5 = Recommendation(5, 5, 2, "garbageinput.com")
+    rec5 = Recommendation(5, 2, "garbageinput.com","8-2-2022")
     ratings = [rec1, rec2, rec3, rec4, rec5]
 
     counter = Rank()
@@ -112,57 +114,84 @@ def test_calculate_recommendation_sum():
 
 
 def test_get_recommender_or_requester_user_id_from_recommendation():
-    recommendation = Recommendation(5, 2, 6, "garbageinput.com")
-    matchID = MatchUsers(recommendation.uniqueUserMatchID, 13, 14)
-    recommender = matchID.getRecommender(2)
-    assert recommender == 14
-    requester = matchID.getRequester(2)
-    assert requester == 13
+    requestID = "ImaRequester"
+    recommendID = "GinaeatsGarbagePlates"
+    item = Item("coffee")
+    matchID = MatchUsers(requestID, recommendID)
+    recommendation = Recommendation(
+        1, matchID.reference, item, "garbageinput.com")
+    recommender = matchID.getRecommender(matchID.reference)
+    assert recommender == "GinaeatsGarbagePlates"
+    requester = matchID.getRequester(matchID.reference)
+    assert requester == "ImaRequester"
 
 
 def test_list_recommender_users():
     """
     if a bunch of people send a recommendation, list them, by their UserIDs
     """
-    rec1 = Recommendation(1, 5, 6, "garbageinput1.com")
-    match1 = MatchUsers(rec1.uniqueUserMatchID, 1, 12)
-    rec2 = Recommendation(2, 6, 6, "garbageinput2.com")
-    match2 = MatchUsers(rec2.uniqueUserMatchID, 1, 13)
-    rec3 = Recommendation(3, 7, 6, "garbageinput3.com")
-    match3 = MatchUsers(rec3.uniqueUserMatchID, 1, 14)
-    rec4 = Recommendation(4, 10, 6, "garbageinput4.com")
-    match4 = MatchUsers(rec4.uniqueUserMatchID, 1, 15)
-    rec5 = Recommendation(5, 1, 7, "garbageinput5.com")
-    match5 = MatchUsers(rec5.uniqueUserMatchID, 1, 16)
+    item1 = Item("pizza")
+    pizza = item1.Name
+    item2 = Item('marshmallow')
+    mm = item2.Name
+    requester1 = User("ImaRequester")
+    requester2 = User("OtherRequester")
+    recommender1 = User("AbbyEats")
+    recommender2 = User("JoeHatesPizza")
+    recommender3 = User("YinaEatsBeanas")
+    recommender4 = User("MyNameSucks")
+    recommender5 = User("AnOldUser")
+    match1 = MatchUsers(requester1.userName, recommender1.userName)
+    match2 = MatchUsers(requester1.userName, recommender2.userName)
+    match3 = MatchUsers(requester2.userName, recommender3.userName)
+    match4 = MatchUsers(requester1.userName, recommender4.userName)
+    match5 = MatchUsers(requester1.userName, recommender5.userName)
+    rec1 = Recommendation(match1.reference,
+                          pizza, "garbageinput1.com","7-16-2022")
+    rec2 = Recommendation(match2.reference,
+                          pizza, "garbageinput2.com","7-16-2022")
+    rec3 = Recommendation(match3.reference,
+                          pizza, "garbageinput3.com","7-16-2022")
+    rec4 = Recommendation(match4.reference,
+                          pizza, "garbageinput4.com","7-16-2022")
+    rec5 = Recommendation(match5.reference,
+                          mm, "garbageinput5.com","7-16-2022")
     recommendations = [rec1, rec2, rec3, rec4, rec5]
     matches = [match1, match2, match3, match4, match5]
     listRecommenders = Outputs()
-    listRecommenders.get_recommenders_with_itemID(recommendations, matches, 6)
-    assert listRecommenders._recommendersList == {12, 13, 14, 15}
+    listRecommenders.get_recommenders_with_same_item(
+        recommendations, matches, pizza)
+    assert listRecommenders._recommendersList == {
+        "AbbyEats", "JoeHatesPizza", "YinaEatsBeanas", "MyNameSucks"}
 
 
 def test_order_recommender_list_by_Rank():
-    item = Item(6, "pizza")
-    item2 = Item(7, "marshmallows")
-    rec1 = Recommendation(1, 5, 6, "placetogetpizza.com")
-    match1 = MatchUsers(rec1.uniqueUserMatchID, 1, 12)
-    recommender1 = User(12, "AbbyEats")
+    item1 = Item("pizza")
+    item2 = Item("marshmallows")
+    requester1 = User("ImaRequester")
+    requester2 = User("OtherRequester")
+    recommender1 = User("AbbyEats")
+    recommender2 = User("JoeHatesPizza")
+    recommender3 = User("YinaEatsBeanas")
+    recommender4 = User("MyNameSucks")
+    recommender5 = User("AnOldUser")
+    match1 = MatchUsers(requester1.userName, recommender1.userName)
+    match2 = MatchUsers(requester1.userName, recommender2.userName)
+    match3 = MatchUsers(requester2.userName, recommender3.userName)
+    match4 = MatchUsers(requester1.userName, recommender4.userName)
+    match5 = MatchUsers(requester1.userName, recommender5.userName)
+    rec1 = Recommendation(match1.reference,
+                          item1.Name, "placetogetpizza.com","8-2-2022")
     match1._rank = 0.5
-    rec2 = Recommendation(2, 6, 6, "yourmom.com")
-    match2 = MatchUsers(rec2.uniqueUserMatchID, 1, 13)
-    recommender2 = User(13, "JoeHatesPizza")
+    rec2 = Recommendation(match2.reference, item1.Name, "yourmom.com","7-25-2020")
     match2._rank = 0.4
-    rec3 = Recommendation(3, 7, 6, "mymom.com")
-    match3 = MatchUsers(rec3.uniqueUserMatchID, 1, 14)
-    recommender3 = User(14, "YinaEatsBeanas")
+    rec3 = Recommendation(match3.reference, item1.Name, "mymom.com","7-25-2020")
     match3._rank = 0.77
-    rec4 = Recommendation(4, 10, 6, "homemade.com")
-    match4 = MatchUsers(rec4.uniqueUserMatchID, 1, 15)
-    recommender4 = User(15, "MyNameSucks")
+    rec4 = Recommendation(match4.reference,
+                          item1.Name, "homemade.com","7-25-2020")
     match4._rank = 0.25
-    rec5 = Recommendation(5, 1, 7, "notpizza.com")
-    match5 = MatchUsers(rec5.uniqueUserMatchID, 1, 16)
-    recommender5 = User(16, "AnOldUser")
+    rec5 = Recommendation(match5.reference,
+                          item2.Name, "notpizza.com","7-25-2020")
     match5._rank = 0
     recommenders = [
         recommender1,
@@ -174,38 +203,19 @@ def test_order_recommender_list_by_Rank():
     recommendations = [rec1, rec2, rec3, rec4, rec5]
     matches = [match1, match2, match3, match4, match5]
     list = Outputs()
-    list.get_ranked_recommendations(recommenders, recommendations, matches, item.itemID)
+    list.get_ranked_recommendations(
+        recommenders, recommendations, matches, item1.Name, requester1.userName)
     assert list._rankedList == [
-        ["YinaEatsBeanas", 6, "mymom.com"],
-        ["AbbyEats", 6, "placetogetpizza.com"],
-        ["JoeHatesPizza", 6, "yourmom.com"],
-        ["MyNameSucks", 6, "homemade.com"],
+        ["AbbyEats", 'pizza', "placetogetpizza.com"],
+        ["JoeHatesPizza", 'pizza', "yourmom.com"],
+        ["MyNameSucks", 'pizza', "homemade.com"],
     ]
 
-
-"""
-User tests
-
-"""
-
-
 def test_get_user_from_input():
-    user = User("5", "BettyRec")
-    assert user.userID == "5"
+    user = User("BettyRec")
     assert isinstance(user, User)
 
 
 def test_item_user_from_input():
-    item = Item("1", "Cookies")
-    assert item.itemID == "1"
+    item = Item("Cookies")
     assert isinstance(item, Item)
-
-
-def test_get_user_from_id():
-    user = User("5", "BettyRec")
-    user.get_user_from_id("5") == "BettyRec"
-
-
-def test_get_item_from_id():
-    user = Item("1", "Cookies")
-    user.get_item_from_id("1") == "Cookies"

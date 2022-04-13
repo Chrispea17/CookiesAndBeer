@@ -5,35 +5,24 @@ from abc import ABC, abstractmethod, abstractproperty
 
 @dataclass
 class Item:
-    def __init__(self, id: str, item: str):
-        self.itemID: str = id  # for now, I'm not sure why this wouldn't end up being an iterated iteger?
-        self.itemName: str = item
-
-    def get_item_from_id(self, id):
-        if self.itemID == id:
-            return self.itemName
+    Name: str
+# this will eventually have data added like a photo
 
 
 @dataclass
 class User:
-    def __init__(self, id: str, Name: str):
-        self.userID: str = id
-        self.userName: str = Name  # if username is changes we expect userid to change too i.e."cannot change username, please make new account"
-
-    def get_user_from_id(self, id):
-        if self.userID == id:
-            return self.userName
+    userName: str
+# this will eventually have data added, like first name, last name, possibly a hashed password, profile information, photo, etc
 
 
 class Recommendation:
-    def __init__(self, id: int, matchid: int, itemID: int, url: str):
-
-        self.recommendationID = id
+    def __init__(self, matchid: int, itemID: int, url: str, date: str):
+        self.date = date
         self.uniqueUserMatchID = matchid
         self.itemID = itemID
         self.findItem = url
         self._recommendationRating: int = None
-        self._rank: int = None
+        self._rank: int = 0  # new users get initialized to zero so for now go to the bottom of the list, but future would like to keep them separate
 
     # Note SHOULD PROBABLY DECOUPLE RATING AND RECOMMENDATION IN UPDATE#
     # allows a recommendation to be rated
@@ -80,17 +69,18 @@ class Rank:
 
 
 class MatchUsers:
-    def __init__(self, id: int, RequesterID: int, RecommenderID: int):
-        self.id = id
-        self.requester = str(RequesterID)
-        self.recommender = str(RecommenderID)
+    def __init__(self, RequesterID: str, RecommenderID: str):
+        self.reference = RequesterID + RecommenderID
+        self.requester = RequesterID
+        self.recommender = RecommenderID
 
     def getRecommender(self, id):
-        if self.id == id:
-            return int(self.recommender)
+        if self.reference == id:
+            return self.recommender
 
     def getRequester(self, id):
-        return int(self.requester)
+        if self.reference == id:
+            return self.requester
 
 
 class Outputs:
@@ -98,27 +88,28 @@ class Outputs:
         self._recommendersList = []
         self._rankedList = []
 
-    def get_recommenders_with_itemID(self, recommendations, matches, ID):
+    def get_recommenders_with_same_item(self, recommendations, matches, ID):
         for recommendation in recommendations:
             if recommendation.itemID == ID:
                 for match in matches:
-                    if match.id == recommendation.uniqueUserMatchID:
-                        self._recommendersList.append(match.getRecommender(match.id))
+                    if match.reference == recommendation.uniqueUserMatchID:
+                        self._recommendersList.append(
+                            match.getRecommender(match.reference))
         self._recommendersList = set(self._recommendersList)
 
-    def get_ranked_recommendations(self, recommenders, recommendations, matches, ID):
+    def get_ranked_recommendations(self, recommenders, recommendations, matches, item, requesterID):
         rankedList = []
         for recommendation in recommendations:
-            if recommendation.itemID == ID:
+            if recommendation.itemID == item: #i should switch searching for user match before item for processing, but later
                 for match in matches:
-                    if match.id == recommendation.uniqueUserMatchID:
+                    if match.reference == recommendation.uniqueUserMatchID and match.requester == requesterID:
                         recommendation._rank = match._rank
                         for recommender in recommenders:
-                            if recommender.userID == match.getRecommender(match.id):
+                            if recommender.userName == match.getRecommender(match.reference):
                                 rankedList.append(
                                     (
                                         [
-                                            recommender.get_user_from_id(recommender.userID),
+                                            recommender.userName,
                                             recommendation.itemID,
                                             recommendation.findItem,
                                         ],
