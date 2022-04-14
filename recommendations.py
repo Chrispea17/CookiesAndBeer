@@ -16,7 +16,7 @@ class User:
 
 @dataclass
 class Recommendation:
-    def __init__(self, matchid: int, itemID: int, url: str, date: str):
+    def __init__(self, matchid: int, itemID: int, url: str, date: str, rating = None, rank =0):
         self.date = date
         self.uniqueUserMatchID = matchid
         self.itemID = itemID
