@@ -14,7 +14,7 @@ class User:
     userName: str
 # this will eventually have data added, like first name, last name, possibly a hashed password, profile information, photo, etc
 
-
+@dataclass
 class Recommendation:
     def __init__(self, matchid: int, itemID: int, url: str, date: str):
         self.date = date
@@ -123,3 +123,5 @@ class Outputs:
     def print_ranked_recommendations(self):
         for items in self._rankedList:
             print(items)
+
+
