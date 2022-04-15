@@ -28,9 +28,9 @@ def test_user_table_can_load_lines(session):
     assert session.query(recommendations.User).all() == expected
 
 
-def test_recommendations_table_can_load_lines(session):
+def test_retrieving_recommendations(session):
     session.execute(
-        "INSERT INTO recommendations (date, matchid, itemID, url) VALUES "
+        "INSERT INTO recommendations (date, uniqueUserMatchID, itemID, findItem) VALUES "
         '("2020-7-25", "Shell-Silver", "cookies", "www.findyouritem.com"),'
         '("2020-2-2", "Shell-Tina", "cookies", "www.findyourcookie.com")'
     )
@@ -42,5 +42,14 @@ def test_recommendations_table_can_load_lines(session):
     ]
     assert session.query(recommendations.Recommendation).all() == expected
 
-
+def test_saving_recommendations(session):
+    recommendation = recommendations.Recommendation(
+            "uniqueuserMatchID", "cookies", "url.com", date=date(2020,7,25))
+    session.add(recommendation)
+    session.commit()
+    rows = session.execute(
+        'SELECT uniqueUserMatchID, itemID, findItem, date, _recommendationRating, _rank FROM "recommendations"'
+    )
+    print(str(rows))
+    assert list(rows)==[("uniqueuserMatchID", "cookies", "url.com","2020-07-25",None,0)]
 

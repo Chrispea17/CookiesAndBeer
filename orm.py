@@ -20,6 +20,7 @@ def recommendation_list_endpoint():
     Recommendation.set(rating)
     #Rating gets stored and is used to calculate ranking for future set of recommendations
 """
+import re
 from xmlrpc.client import DateTime
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, MetaData, Float, Date
 from sqlalchemy.orm import relationship, mapper
@@ -32,11 +33,11 @@ recommendations = Table(
     "recommendations", metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("date", Date),
-    Column("matchID", String(255)),
+    Column("uniqueUserMatchID", String(255)),
     Column("itemID", String(255)),
-    Column("url", String(255)),
-    Column("rating", Integer),
-    Column("rank", Float),
+    Column("findItem", String(255)),
+    Column("_recommendationRating", Integer),
+    Column("_rank", Float),
 )
 
 items = Table(
