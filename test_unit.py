@@ -166,6 +166,11 @@ def test_list_recommender_users():
 
 
 def test_order_recommender_list_by_Rank():
+    """
+    TODO:refactor to set this as a data set for all tests and call
+    the complexity of the test is due to the calculation of the rank which needs more than one recommendation
+    the factory pattern design patterns gang of four "factory boy package"
+    """
     item1 = Item("pizza")
     item2 = Item("marshmallows")
     requester1 = User("ImaRequester")
@@ -174,7 +179,7 @@ def test_order_recommender_list_by_Rank():
     recommender2 = User("JoeHatesPizza")
     recommender3 = User("YinaEatsBeanas")
     recommender4 = User("MyNameSucks")
-    recommender5 = User("AnOldUser")
+    recommender5 = User("AnOldUser") 
     match1 = MatchUsers(requester1.userName, recommender1.userName)
     match2 = MatchUsers(requester1.userName, recommender2.userName)
     match3 = MatchUsers(requester2.userName, recommender3.userName)
