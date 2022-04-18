@@ -4,26 +4,6 @@ from recommendations import Outputs, Rank, Recommendation, MatchUsers, User, Ite
 import pytest
 
 
-def test_positive_rating_equals_one():
-    recommendation = Recommendation(1, 25, 1, "howdy.com")
-    recommendation.setRating("good")
-    assert recommendation._recommendationRating == 1
-
-
-def test_negative_rating_equals_zero():
-    recommendation = Recommendation(1, 16, 5, "fifth.com")
-    recommendation.setRating("bad")
-    assert recommendation._recommendationRating == 0
-
-
-def test_other_rating_not_possible():
-    with pytest.raises(Exception):
-        recommendation = Recommendation(1, 6, 6, "garbageinput.com")
-        recommendation.setRating("garbage-in")
-        assert recommendation._recommendationRating == 1
-        assert recommendation._recommendationRating == 0
-
-
 def test_this_is_a_recommendation_with_correct_data_types():
     recommendation = Recommendation(
         "7-15-2022", "Jean-Joe", "cookies", "www.findyouritem.com")
@@ -53,14 +33,14 @@ def test_this_is_a_recommendation_with_correct_data():
 
 
 def test_calculate_rank():
-    rec1 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
+    rec1 = Recommendation(5, 6, "garbageinput.com","8-2-2022", reference = 1)
     rec1.setRating("good")
-    rec2 = Recommendation(6, 7, "garbageinput.com","8-2-2022")
-    rec3 = Recommendation(5, 8, "g2.com","8-2-2022")
+    rec2 = Recommendation(6, 7, "garbageinput.com","8-2-2022", reference = 2)
+    rec3 = Recommendation(5, 8, "g2.com","8-2-2022", reference = 3)
     rec3.setRating("bad")
-    rec4 = Recommendation(5, 9, "garbageinput.com","8-2-2022")
+    rec4 = Recommendation(5, 9, "garbageinput.com","8-2-2022", reference = 4)
     rec4.setRating("good")
-    rec5 = Recommendation(5, 10, "garbageinput.com","8-2-2022")
+    rec5 = Recommendation(5, 10, "garbageinput.com","8-2-2022", reference = 5)
     ratings = [rec1, rec2, rec3, rec4, rec5]
 
     counter = Rank()
@@ -73,35 +53,18 @@ def test_calculate_rank():
 
 
 # I've got no where to put this because I don't have UniqueUserMatchIDs to assign the Count to
-def test_calculate_recommendation_count():
-    rec1 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
-    rec1.setRating("good")
-    rec2 = Recommendation(6, 6, "garbageinput.com","8-2-2022")
-    rec3 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
-    rec3.setRating("bad")
-    rec4 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
-    rec4.setRating("good")
-    rec5 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
-    ratings = [rec1, rec2, rec3, rec4, rec5]
 
-    counter = Rank()
-    counter.countforRank(ratings, 5)
-    assert counter._count == 3
-    counter.countforRank(ratings, 6)
-    assert counter._count == None
-    counter.countforRank(ratings, 10)
-    assert counter._count == None
 
 
 def test_calculate_recommendation_sum():
-    rec1 = Recommendation(5, 6, "garbageinput.com","8-2-2022")
+    rec1 = Recommendation(5, 6, "garbageinput.com","8-2-2022", reference = 1)
     rec1.setRating("good")
-    rec2 = Recommendation(6, 6, "garbageinput.com","8-2-2022")
-    rec3 = Recommendation(5, 4, "garbageinput.com","8-2-2022")
+    rec2 = Recommendation(6, 6, "garbageinput.com","8-2-2022", reference = 2)
+    rec3 = Recommendation(5, 4, "garbageinput.com","8-2-2022", reference = 3)
     rec3.setRating("bad")
-    rec4 = Recommendation(5, 3, "garbageinput.com","8-2-2022")
+    rec4 = Recommendation(5, 3, "garbageinput.com","8-2-2022", reference = 4)
     rec4.setRating("good")
-    rec5 = Recommendation(5, 2, "garbageinput.com","8-2-2022")
+    rec5 = Recommendation(5, 2, "garbageinput.com","8-2-2022", reference = 5)
     ratings = [rec1, rec2, rec3, rec4, rec5]
 
     counter = Rank()
@@ -119,7 +82,7 @@ def test_get_recommender_or_requester_user_id_from_recommendation():
     item = Item("coffee")
     matchID = MatchUsers(requestID, recommendID)
     recommendation = Recommendation(
-        1, matchID.reference, item, "garbageinput.com")
+        1, matchID.reference, item, "garbageinput.com", reference = 1)
     recommender = matchID.getRecommender(matchID.reference)
     assert recommender == "GinaeatsGarbagePlates"
     requester = matchID.getRequester(matchID.reference)
@@ -147,15 +110,15 @@ def test_list_recommender_users():
     match4 = MatchUsers(requester1.userName, recommender4.userName)
     match5 = MatchUsers(requester1.userName, recommender5.userName)
     rec1 = Recommendation(match1.reference,
-                          pizza, "garbageinput1.com","7-16-2022")
+                          pizza, "garbageinput1.com","7-16-2022", reference = 1)
     rec2 = Recommendation(match2.reference,
-                          pizza, "garbageinput2.com","7-16-2022")
+                          pizza, "garbageinput2.com","7-16-2022", reference = 2)
     rec3 = Recommendation(match3.reference,
-                          pizza, "garbageinput3.com","7-16-2022")
+                          pizza, "garbageinput3.com","7-16-2022", reference = 3)
     rec4 = Recommendation(match4.reference,
-                          pizza, "garbageinput4.com","7-16-2022")
+                          pizza, "garbageinput4.com","7-16-2022", reference = 4)
     rec5 = Recommendation(match5.reference,
-                          mm, "garbageinput5.com","7-16-2022")
+                          mm, "garbageinput5.com","7-16-2022", reference = 5)
     recommendations = [rec1, rec2, rec3, rec4, rec5]
     matches = [match1, match2, match3, match4, match5]
     listRecommenders = Outputs()
@@ -186,17 +149,17 @@ def test_order_recommender_list_by_Rank():
     match4 = MatchUsers(requester1.userName, recommender4.userName)
     match5 = MatchUsers(requester1.userName, recommender5.userName)
     rec1 = Recommendation(match1.reference,
-                          item1.Name, "placetogetpizza.com","8-2-2022")
+                          item1.Name, "placetogetpizza.com","8-2-2022", reference = 1)
     match1._rank = 0.5
-    rec2 = Recommendation(match2.reference, item1.Name, "yourmom.com","7-25-2020")
+    rec2 = Recommendation(match2.reference, item1.Name, "yourmom.com","7-25-2020", reference = 2)
     match2._rank = 0.4
-    rec3 = Recommendation(match3.reference, item1.Name, "mymom.com","7-25-2020")
+    rec3 = Recommendation(match3.reference, item1.Name, "mymom.com","7-25-2020", reference = 3)
     match3._rank = 0.77
     rec4 = Recommendation(match4.reference,
-                          item1.Name, "homemade.com","7-25-2020")
+                          item1.Name, "homemade.com","7-25-2020", reference=4)
     match4._rank = 0.25
     rec5 = Recommendation(match5.reference,
-                          item2.Name, "notpizza.com","7-25-2020")
+                          item2.Name, "notpizza.com","7-25-2020",reference=5)
     match5._rank = 0
     recommenders = [
         recommender1,

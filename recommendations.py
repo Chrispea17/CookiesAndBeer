@@ -16,56 +16,22 @@ class User:
 
 @dataclass
 class Recommendation:
-    def __init__(self, matchid: str, itemID: str, url: str, date: str, rating = None, rank =0):
+    def __init__(self, matchid : str, itemID: str, url: str, date: str, rating = None, rank =0, reference = 0):
+        self.reference = reference
         self.date = date
         self.uniqueUserMatchID = matchid
         self.itemID = itemID
         self.findItem = url
         self._recommendationRating: int = None
         self._rank: int = 0  # new users get initialized to zero so for now go to the bottom of the list, but future would like to keep them separate
+        #I am realizing now that rank doesn't belong with the ratings (otherwise you will get repeated data in the database, so)
+        #we want to refactor to the matched users but that also couples Matched users and recommendations. 
 
     # Note SHOULD PROBABLY DECOUPLE RATING AND RECOMMENDATION IN UPDATE#
     # allows a recommendation to be rated
     def setRating(self, response: str) -> int:
         ratings = {"good": 1, "bad": 0}
         self._recommendationRating = ratings[response]
-
-
-class Rank:
-    def __init__(self):
-        self._rank: float = None
-        self._count: int = None
-        self._sum: int = None
-
-    # Note SHOULD PROBABLY DECOUPLE COUNT AND RANK IN UPDATE#
-    # counts # of Recommendations
-    def countforRank(self, data, uniqueusermatch):
-        self._count = 0
-        for item in data:
-            if (
-                item.uniqueUserMatchID == uniqueusermatch
-                and item._recommendationRating != None
-            ):
-                self._count += 1
-        if self._count == 0:
-            self._count = None
-
-    def sumforRank(self, data, uniqueusermatch):
-        self._sum = 0
-        for item in data:
-            if (
-                item.uniqueUserMatchID == uniqueusermatch
-                and item._recommendationRating != None
-                and item._recommendationRating == 1
-            ):
-                self._sum += 1
-            if self._sum == 0:
-                self._sum = None
-
-    def setRank(self, data, uniqueusermatch) -> float:
-        self.sumforRank(data, uniqueusermatch)
-        self.countforRank(data, uniqueusermatch)
-        self._rank = self._sum / self._count
 
 
 class MatchUsers:

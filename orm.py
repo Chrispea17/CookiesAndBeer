@@ -31,7 +31,7 @@ metadata = MetaData()
 
 recommendations = Table(
     "recommendations", metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("reference", Integer, primary_key=True, autoincrement=True),
     Column("date", Date),
     Column("uniqueUserMatchID", String(255)),
     Column("itemID", String(255)),

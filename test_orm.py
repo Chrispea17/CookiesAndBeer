@@ -53,3 +53,17 @@ def test_saving_recommendations(session):
     print(str(rows))
     assert list(rows)==[("uniqueuserMatchID", "cookies", "url.com","2020-07-25",None,0)]
 
+# def test_retrieving_ranked_recommendations_only(session):
+#     session.execute(
+#         "INSERT INTO recommendations (date, uniqueUserMatchID, itemID, findItem) VALUES "
+#         '("2020-7-25", "Shell-Silver", "cookies", "www.findyouritem.com", ),'
+#         '("2020-2-2", "Shell-Tina", "cookies", "www.findyourcookie.com")'
+#     )
+#     expected = [
+#         recommendations.Recommendation(
+#             "Shell-Silver", "cookies", "www.findyouritem.com", date=date(2020,7,25)),
+#         recommendations.Recommendation(
+#             "Shell-Tina", "cookies", "www.findyourcookie.com",date=date(2020,2,2)),
+#     ]
+#     assert session.query(recommendations.Recommendation).all() == expected
+
