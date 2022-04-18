@@ -23,7 +23,7 @@ def recommendation_list_endpoint():
 import re
 from xmlrpc.client import DateTime
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, MetaData, Float, Date
-from sqlalchemy.orm import relationship, mapper
+from sqlalchemy.orm import relationship, mapper, update 
 from abc import *
 from recommendations import *
 
@@ -56,6 +56,7 @@ match_users = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("RequesterID", String(255)),
     Column("RecommenderID", String(255)),
+    Column("_rank", Float)
 )
 
 def start_mappers():

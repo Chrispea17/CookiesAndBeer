@@ -53,6 +53,9 @@ def test_saving_recommendations(session):
     print(str(rows))
     assert list(rows)==[("uniqueuserMatchID", "cookies", "url.com","2020-07-25",None)]
 
+# def test_saving_ratings_to_recommendations():
+
+
 # def test_retrieving_ranked_recommendations_only(session):
 #     session.execute(
 #         "INSERT INTO recommendations (date, uniqueUserMatchID, itemID, findItem) VALUES "

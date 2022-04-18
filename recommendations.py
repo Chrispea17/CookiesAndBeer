@@ -23,6 +23,7 @@ class Recommendation:
         self.itemID = itemID
         self.findItem = url
         self._recommendationRating: int = None
+        self._rank = 0
 
     # Note SHOULD PROBABLY DECOUPLE RATING AND RECOMMENDATION IN UPDATE#
     # allows a recommendation to be rated
@@ -32,11 +33,10 @@ class Recommendation:
 
 
 class MatchUsers:
-    def __init__(self, RequesterID: str, RecommenderID: str, countRatings = None, rank=0):
+    def __init__(self, RequesterID: str, RecommenderID: str, rank=0):
         self.reference = RequesterID + RecommenderID
         self.requester = RequesterID
         self.recommender = RecommenderID
-        self._count = countRatings
         self._rank: int = rank
 
     def getRecommender(self, id):
@@ -47,78 +47,13 @@ class MatchUsers:
         if self.reference == id:
             return self.requester
     
-def countRecommendationsForMatch(data: list[Recommendation], id):
-    count = 0
-    for item in data:
-        if (
-            item.uniqueUserMatchID == id
-            and item._recommendationRating != None
-        ):
-            count += 1
-    if count == 0:
-        count = None
-    return count
-
-def sumRatings(data: list[Recommendation], uniqueusermatch):
-        sum = 0
-        for item in data:
-            if (
-                item.uniqueUserMatchID == uniqueusermatch
-                and item._recommendationRating != None
-                and item._recommendationRating == 1
-            ):
-                sum += 1
-            if sum == 0:
-                sum = None
-        return sum
-
-def setRank(data, uniqueusermatch) -> float:
-    sum = sumRatings(data, uniqueusermatch)
-    count = countRecommendationsForMatch(data, uniqueusermatch)
-    rank = sum / count
-    return rank
+    def setRank(self, rank, id):
+        if self.reference == id: 
+            self._rank = rank
+    
 
 
 
-class Outputs:
-    def __init__(self) -> None:
-        self._recommendersList = []
-        self._rankedList = []
 
-    def get_recommenders_with_same_item(self, recommendations, matches, ID):
-        for recommendation in recommendations:
-            if recommendation.itemID == ID:
-                for match in matches:
-                    if match.reference == recommendation.uniqueUserMatchID:
-                        self._recommendersList.append(
-                            match.getRecommender(match.reference))
-        self._recommendersList = set(self._recommendersList)
-
-    def get_ranked_recommendations(self, recommenders, recommendations, matches, item, requesterID):
-        rankedList = []
-        for recommendation in recommendations:
-            if recommendation.itemID == item: #i should switch searching for user match before item for processing, but later
-                for match in matches:
-                    if match.reference == recommendation.uniqueUserMatchID and match.requester == requesterID:
-                        recommendation._rank = match._rank
-                        for recommender in recommenders:
-                            if recommender.userName == match.getRecommender(match.reference):
-                                rankedList.append(
-                                    (
-                                        [
-                                            recommender.userName,
-                                            recommendation.itemID,
-                                            recommendation.findItem,
-                                        ],
-                                        recommendation._rank,
-                                    )
-                                )
-        rankedList.sort(key=lambda y: y[1], reverse=True)
-        self._rankedList = [y[0] for y in rankedList]
-        print(self._rankedList)
-
-    def print_ranked_recommendations(self):
-        for items in self._rankedList:
-            print(items)
 
 
