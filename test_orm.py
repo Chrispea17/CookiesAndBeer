@@ -48,10 +48,10 @@ def test_saving_recommendations(session):
     session.add(recommendation)
     session.commit()
     rows = session.execute(
-        'SELECT uniqueUserMatchID, itemID, findItem, date, _recommendationRating, _rank FROM "recommendations"'
+        'SELECT uniqueUserMatchID, itemID, findItem, date, _recommendationRating FROM "recommendations"'
     )
     print(str(rows))
-    assert list(rows)==[("uniqueuserMatchID", "cookies", "url.com","2020-07-25",None,0)]
+    assert list(rows)==[("uniqueuserMatchID", "cookies", "url.com","2020-07-25",None)]
 
 # def test_retrieving_ranked_recommendations_only(session):
 #     session.execute(

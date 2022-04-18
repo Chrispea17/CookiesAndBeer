@@ -16,16 +16,13 @@ class User:
 
 @dataclass
 class Recommendation:
-    def __init__(self, matchid : str, itemID: str, url: str, date: str, rating = None, rank =0, reference = 0):
+    def __init__(self, matchid : str, itemID: str, url: str, date: str, rating = None, reference = 0):
         self.reference = reference
         self.date = date
         self.uniqueUserMatchID = matchid
         self.itemID = itemID
         self.findItem = url
         self._recommendationRating: int = None
-        self._rank: int = 0  # new users get initialized to zero so for now go to the bottom of the list, but future would like to keep them separate
-        #I am realizing now that rank doesn't belong with the ratings (otherwise you will get repeated data in the database, so)
-        #we want to refactor to the matched users but that also couples Matched users and recommendations. 
 
     # Note SHOULD PROBABLY DECOUPLE RATING AND RECOMMENDATION IN UPDATE#
     # allows a recommendation to be rated
@@ -35,10 +32,12 @@ class Recommendation:
 
 
 class MatchUsers:
-    def __init__(self, RequesterID: str, RecommenderID: str):
+    def __init__(self, RequesterID: str, RecommenderID: str, countRatings = None, rank=0):
         self.reference = RequesterID + RecommenderID
         self.requester = RequesterID
         self.recommender = RecommenderID
+        self._count = countRatings
+        self._rank: int = rank
 
     def getRecommender(self, id):
         if self.reference == id:
@@ -47,6 +46,38 @@ class MatchUsers:
     def getRequester(self, id):
         if self.reference == id:
             return self.requester
+    
+def countRecommendationsForMatch(data: list[Recommendation], id):
+    count = 0
+    for item in data:
+        if (
+            item.uniqueUserMatchID == id
+            and item._recommendationRating != None
+        ):
+            count += 1
+    if count == 0:
+        count = None
+    return count
+
+def sumRatings(data: list[Recommendation], uniqueusermatch):
+        sum = 0
+        for item in data:
+            if (
+                item.uniqueUserMatchID == uniqueusermatch
+                and item._recommendationRating != None
+                and item._recommendationRating == 1
+            ):
+                sum += 1
+            if sum == 0:
+                sum = None
+        return sum
+
+def setRank(data, uniqueusermatch) -> float:
+    sum = sumRatings(data, uniqueusermatch)
+    count = countRecommendationsForMatch(data, uniqueusermatch)
+    rank = sum / count
+    return rank
+
 
 
 class Outputs:

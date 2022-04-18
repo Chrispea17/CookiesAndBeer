@@ -37,7 +37,6 @@ recommendations = Table(
     Column("itemID", String(255)),
     Column("findItem", String(255)),
     Column("_recommendationRating", Integer),
-    Column("_rank", Float),
 )
 
 items = Table(

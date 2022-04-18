@@ -18,39 +18,31 @@ def setRating(response: str, recommendations: list[Recommendation], reference) -
 #         self._sum: int = None
 
     # counts # of Recommendations
-def count_recommendations_for_user_and_ratings(data: list(Recommendation), uniqueusermatch):
-    count = 0
-    for item in data:
-        if (
-            item.uniqueUserMatchID == uniqueusermatch
-            and item._recommendationRating != None
-        ):
-            count += 1
-    if count == 0:
-        count = None
+# def countRecommendations(data: list(Recommendation), uniqueusermatch):
 
-    def sumforRank(self, data, uniqueusermatch):
-        self._sum = 0
-        for item in data:
-            if (
-                item.uniqueUserMatchID == uniqueusermatch
-                and item._recommendationRating != None
-                and item._recommendationRating == 1
-            ):
-                self._sum += 1
-            if self._sum == 0:
-                self._sum = None
 
-    def setRank(self, data, uniqueusermatch) -> float:
-        self.sumforRank(data, uniqueusermatch)
-        self.countforRank(data, uniqueusermatch)
-        self._rank = self._sum / self._count
+#     def sumforRank(self, data, uniqueusermatch):
+#         self._sum = 0
+#         for item in data:
+#             if (
+#                 item.uniqueUserMatchID == uniqueusermatch
+#                 and item._recommendationRating != None
+#                 and item._recommendationRating == 1
+#             ):
+#                 self._sum += 1
+#             if self._sum == 0:
+#                 self._sum = None
+
+#     def setRank(self, data, uniqueusermatch) -> float:
+#         self.sumforRank(data, uniqueusermatch)
+#         self.countforRank(data, uniqueusermatch)
+#         self._rank = self._sum / self._count
 
 
 
 
-# def rank():
-#     #get a list of recommendations from with a particular uniqueUserMatchID and calculate the rank of all rated recommendations
-#     #step 1
+# # def rank():
+# #     #get a list of recommendations from with a particular uniqueUserMatchID and calculate the rank of all rated recommendations
+# #     #step 1
 
     
