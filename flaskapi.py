@@ -1,44 +1,47 @@
-# from datetime import datetime
-# import json
+from datetime import datetime
+import json
+import commands
+import bootstrap
+from flask import Flask, jsonify, request
 
-# from flask import Flask, jsonify, request
+app = Flask(__name__)
+bus = bootstrap.bootstrap()
 
-# app = Flask(__name__)
+@app.route('/')
+def index():
+    return f'Barky API'
 
-# @app.route('/')
-# def index():
-#     return f'Barky API'
 
-# @app.route('/add_bookmark', methods=['POST'])
-# def add_confirm_and_remove_bookmark():
 
-#     # id: int
-#     # title: str
-#     # url: str
-#     # # data["date_added"] = datetime.utcnow().isoformat()
-#     # date_added: str
-#     # date_edited: str
-#     # notes: Optional[str] = None
+@app.route('/make_recommendation', methods=['POST'])
+def add_confirm_and_remove_recommendation():
+
+
+    date : str
+    matchID : str
+    itemID : str
+    url : str
+    # _recommendationRating: int = None
+    # _rank = 0
 
 #     # title, url, notes, date_added, date_edited
-#     data = request.get_json()
+    data = request.get_json()
 #     id = data["id"]
-#     title = data["title"]
-#     url = data["url"]
-#     date_added = data["date_added"]
-#     date_edited = data["date_edited"]
-#     notes = data["notes"]
+    date = data["date"]
+    url = data["findItem"]
+    itemID = data["itemID"]
+    matchID = data["matchID"]
 
-#     cmd = commands.AddBookmarkCommand(
-#             id, title, url, date_added, date_edited, notes,
-#     )
-#     bus.handle(cmd)
-#     return "OK", 201
+    cmd = commands.AddRecommendation(
+            date, url, itemID, matchID,
+    )
+    bus.handle(cmd)
+    return "OK", 201
 
 
-# @app.route("/bookmarks/<title>", methods=['GET'])
-# def get_bookmark_by_title(title):
-#     result = views.bookmarks_view(title, bus.uow)
+@app.route("/recommendations/<itemID>", methods=['GET'])
+def get_bookmark_by_item(itemID):
+   result = views.bookmarks_view(title, bus.uow)
 #     if not result:
 #          return "not found", 404
 #     return jsonify(result), 200
