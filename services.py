@@ -2,7 +2,8 @@
 # The next is using all previous recommendations to calculate the rank of each new person giving a recommendation and including those who have never given a recommendation before
 
 
-from recommendations import Recommendation, MatchUsers
+from difflib import Match
+from recommendations import Recommendation, MatchUsers, User
 
 
 def setRating(response: str, recommendations: list[Recommendation], reference) -> int:
@@ -12,11 +13,11 @@ def setRating(response: str, recommendations: list[Recommendation], reference) -
             return recs._recommendationRating
 
 
-def countRecommendationsForMatch(data: list[Recommendation], id):
+def countRecommendationsForMatch(data: list[Recommendation], uniqueUserMatch):
     count = 0
     for item in data:
         if (
-            item.uniqueUserMatchID == id
+            item.uniqueUserMatchID == uniqueUserMatch
             and item._recommendationRating != None
         ):
             count += 1
@@ -45,7 +46,6 @@ def setRank(data: list[Recommendation], id):
     rank = sum / count
     return rank
 
-
 def getRecommendersForItem(recs : list[Recommendation], matches : list[MatchUsers], ItemId):
     recommendersList = []
     for recommendation in recs:
@@ -57,7 +57,8 @@ def getRecommendersForItem(recs : list[Recommendation], matches : list[MatchUser
     recommendersList = set(recommendersList)
     return recommendersList
 
-def getRankedRecommendations(recommenders, recommendations, matches, item, requesterID):
+
+def getRankedRecommendations(recommenders: list[User], recommendations: list[Recommendation], matches: list[Match], item, requesterID):
     rankedList = []
     for recommendation in recommendations:
         if recommendation.itemID == item: #i should switch searching for user match before item for processing, but later

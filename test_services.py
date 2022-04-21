@@ -7,8 +7,10 @@ def test_set_rating_on_particular_recommendation():
     recommendation45 = Recommendation("1234", "icecream", "geticecream.com", "7-12-1997", reference = 45)
     rating=setRating("good", [recommendation1,recommendation45], 45)
     assert rating == 1
+    assert recommendation45._recommendationRating==1
     rating2=setRating("bad", [recommendation1,recommendation45], 4)
     assert rating2 == 0
+    assert recommendation1._recommendationRating==0
 
 
 def test_calculate_recommendation_count_for_usermatch():
@@ -148,7 +150,7 @@ def test_list_recommender_users():
 
 def test_list_recommender_users():
     """
-    if a bunch of people send a recommendation, list them, by their UserIDs
+    if a bunch of people send a recommendation, list them, by their rank
     """
     item1 = Item("pizza")
     pizza = item1.Name

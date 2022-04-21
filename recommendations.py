@@ -37,7 +37,7 @@ class MatchUsers:
         self.reference = RequesterID + RecommenderID
         self.requester = RequesterID
         self.recommender = RecommenderID
-        self._rank: int = rank
+        self._rank = 0
 
     def getRecommender(self, id):
         if self.reference == id:
