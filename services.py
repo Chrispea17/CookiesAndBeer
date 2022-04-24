@@ -59,9 +59,6 @@ def getRecommendersForItem(recs : list[Recommendation], matches : list[MatchUser
 
 
 def getRankedRecommendations(recommenders: list[User], recommendations: list[Recommendation], matches: list[Match], item, requesterID):
-    """
-    TODO: refactor to a better sort method. There's gotta be something out ther
-    """
     rankedList = []
     for recommendation in recommendations:
         if recommendation.itemID == item: #i should switch searching for user match before item for processing, but later
@@ -87,4 +84,3 @@ def getRankedRecommendations(recommenders: list[User], recommendations: list[Rec
 # def printRankedRecommendations(rankedList):
 #     for items in rankedList:
 #         print(items)
-
