@@ -66,3 +66,5 @@ def test_repository_can_save_rank(session):
     ))
     assert list(rows) == [('4','4',"url", 1)]
 
+
+

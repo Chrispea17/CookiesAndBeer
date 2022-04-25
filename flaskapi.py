@@ -1,13 +1,13 @@
-# from datetime import datetime
-# import json
+from datetime import datetime
+import json
 
-# from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request
 
-# app = Flask(__name__)
+app = Flask(__name__)
 
-# @app.route('/')
-# def index():
-#     return f'Barky API'
+@app.route('/recommendations')
+def index():
+    return f'API'
 
 # @app.route('/add_bookmark', methods=['POST'])
 # def add_confirm_and_remove_bookmark():
