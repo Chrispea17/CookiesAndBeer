@@ -1,52 +1,56 @@
-from pickle import TRUE
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+# from datetime import datetime
+# import json
 
-from sqla_repository import *
-from baseapi import AbstractRecommendationAPI
+# from flask import Flask, jsonify, request
 
-# init from dotenv file
-# from dotenv import load_dotenv
-# load_dotenv()
+# app = Flask(__name__)
 
-app = Flask(__name__)
+# @app.route('/')
+# def index():
+#     return f'Barky API'
 
-class FlaskRecommendationAPI(AbstractRecommendationAPI):
-    """
-    Flask 
-    """
-    def __init__(self) -> None:
-        super().__init__()
-    
-    @app.route('/')
-    def index(self):
-        return f'MyRecommendation'
+# @app.route('/add_bookmark', methods=['POST'])
+# def add_confirm_and_remove_bookmark():
 
-    # @app.route('/api/one/<id>')
-    # def one(self, id):
-    #     return f'The provided id is {id}'
+#     # id: int
+#     # title: str
+#     # url: str
+#     # # data["date_added"] = datetime.utcnow().isoformat()
+#     # date_added: str
+#     # date_edited: str
+#     # notes: Optional[str] = None
 
-    # @app.route('/api/all')
-    # def all(self):
-    #     return f'all records'
+#     # title, url, notes, date_added, date_edited
+#     data = request.get_json()
+#     id = data["id"]
+#     title = data["title"]
+#     url = data["url"]
+#     date_added = data["date_added"]
+#     date_edited = data["date_edited"]
+#     notes = data["notes"]
 
-    # @app.route('/api/first/<property>/<value>/<sort>')
-    # def first(self, filter, value, sort):
-    #     return f'the first '
-    #     pass
-    
-    # def many(self, filter, value, sort):
-    #     pass
-    
-    # def add(recommendation):
-    #     pass
-
-    # def delete(recommendation):
-    #     pass
-
-    # def update(recommendation):
-    #     pass
+#     cmd = commands.AddBookmarkCommand(
+#             id, title, url, date_added, date_edited, notes,
+#     )
+#     bus.handle(cmd)
+#     return "OK", 201
 
 
-if __name__=="__main__":
-    app.run(debug=TRUE)
+# @app.route("/bookmarks/<title>", methods=['GET'])
+# def get_bookmark_by_title(title):
+#     result = views.bookmarks_view(title, bus.uow)
+#     if not result:
+#          return "not found", 404
+#     return jsonify(result), 200
+
+# def get_bookmark_by_id( title):
+#     pass
+
+# def delete(bookmark):
+#     pass
+
+# def update(bookmark):
+#     pass
+
+# if __name__ == "__main__":
+#     app.run()

@@ -5,9 +5,6 @@ import recommendations
 
 
 class AbstractRepository(abc.ABC):
-    def __init__(self):
-        self.recommendations = set()
-        
     @abc.abstractmethod
     def add(self, recommendation: recommendations.Recommendation):
         raise NotImplementedError
@@ -32,5 +29,3 @@ class RecommendationRepository(AbstractRepository):
 
     def matchlist(self, recommendations, matchid):
         return self.session.query(recommendations.Recommendation).all().filter_by(matchid)
-
-        

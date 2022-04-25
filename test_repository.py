@@ -9,7 +9,8 @@ from sqlalchemy import update
 from repository import RecommendationRepository
 from services import setRating, setRank
 
-# 
+# pytestmark = pytest.mark.usefixtures('mappers')
+
 def test_repo_can_save_a_recommendation(session):
     recommendation = recommendations.Recommendation(4,4,"url",date=date(2020,7,25))
     repo = RecommendationRepository(session)
@@ -64,5 +65,4 @@ def test_repository_can_save_rank(session):
         'SELECT uniqueUserMatchID, itemID, findItem, _recommendationRating FROM recommendations'
     ))
     assert list(rows) == [('4','4',"url", 1)]
-
 
