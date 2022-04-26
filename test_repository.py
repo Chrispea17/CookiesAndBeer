@@ -43,9 +43,8 @@ def test_repository_can_save_rating(session):
     repo.add(recommendation)
     session.commit()
     reference=0
-    x = repo.get(recommendation)
-    print(x)
-    x._recommendationRating = setRating("good",x,reference)
+    x = repo.get(reference)
+    x._recommendationRating = setRating("good",[x],reference)
     session.commit()
     rows = list(session.execute(
         'SELECT uniqueUserMatchID, itemID, findItem, _recommendationRating FROM recommendations'
@@ -58,15 +57,12 @@ def test_repository_can_save_rank(session):
     repo.add(recommendation)
     session.commit()
     reference=0
-    x = repo.get(recommendation)
-    print(x)
-    x._recommendationRating = setRating("good",x,reference)
+    x = repo.get(reference)
+    x._recommendationRating = setRating("good",[x],reference)
     session.commit()
-    x._rank = setRank(x,recommendation.uniqueUserMatchID)
+    x._rank = setRank([x],recommendation.uniqueUserMatchID)
     rows = list(session.execute(
         'SELECT uniqueUserMatchID, itemID, findItem, _recommendationRating FROM recommendations'
     ))
     assert list(rows) == [('4','4',"url", 1)]
-
-
 
