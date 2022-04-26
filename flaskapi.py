@@ -1,39 +1,43 @@
 from datetime import datetime
 import json
+import commands
 
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-@app.route('/recommendations')
+@app.route('/')
 def index():
-    return f'API'
+    return f'APIS'
 
-# @app.route('/add_bookmark', methods=['POST'])
-# def add_confirm_and_remove_bookmark():
+@app.route('/submit')
+def submit_recommendation():
+    return f'submit your recommendation'
 
-#     # id: int
-#     # title: str
-#     # url: str
-#     # # data["date_added"] = datetime.utcnow().isoformat()
-#     # date_added: str
-#     # date_edited: str
-#     # notes: Optional[str] = None
+# @app.route('/view_item_recommendations/<id>', methods=['GET'])
+# def list_recommendations_by_itemID():
+
+@app.route('/add_recommendation', methods=['POST'])
+def add_confirm_and_remove_bookmark():
+    itemID: str
+    uniqueUserMatchID: str
+    findItem: str
+    date: str
+
 
 #     # title, url, notes, date_added, date_edited
 #     data = request.get_json()
 #     id = data["id"]
 #     title = data["title"]
 #     url = data["url"]
-#     date_added = data["date_added"]
-#     date_edited = data["date_edited"]
-#     notes = data["notes"]
+#     date = data["date_added"]
 
-#     cmd = commands.AddBookmarkCommand(
-#             id, title, url, date_added, date_edited, notes,
-#     )
-#     bus.handle(cmd)
-#     return "OK", 201
+
+    cmd = commands.AddRecommendationCommand(
+            itemID, uniqueUserMatchID, findItem, date
+    )
+    # bus.handle(cmd)
+    # return "OK", 201
 
 
 # @app.route("/bookmarks/<title>", methods=['GET'])
@@ -52,5 +56,5 @@ def index():
 # def update(bookmark):
 #     pass
 
-# if __name__ == "__main__":
-#     app.run()
+if __name__ == "__main__":
+    app.run()

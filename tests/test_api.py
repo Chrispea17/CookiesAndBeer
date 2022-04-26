@@ -19,16 +19,27 @@
 #         f"{url}/recommendation", json={"itemID": itemID, "uniqueUserMatchID": uniqueUserMatchID, "findItem": findItem, "date": date}
 #     )
     
+# import pytest
+# import requests
+# from requests.adapters import HTTPAdapter, Retry
+
+
+
+import json
 import pytest
-import requests
 
-LOCALHOST = "http://127.0.0.1:5000/"
+from flask import request
 
+
+LOCALHOST = 'http://127.0.0.1:5000/'
 
 def test_api_can_connect():
     res = requests.get(LOCALHOST)
     assert res != None
 
+def test_api_index():
+    res = requests.get(LOCALHOST)
+    assert res != None
 
 # @pytest.mark.usefixtures('in_memory_sqlite_db')
 # def test_api_runs():

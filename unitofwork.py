@@ -8,7 +8,7 @@ from sqlalchemy.orm.session import Session
 import config
 import repository
 
-from recommendations import Recommendation
+# from recommendations import Recommendation
 
 
 class AbstractUnitOfWork(ABC):
@@ -23,18 +23,18 @@ class AbstractUnitOfWork(ABC):
     def commit(self):
         self._commit()
 
-    # def collect_new_events(self):
-    #     for recommendation in self.recommendation.seen:
-    #         while bookmark.events:
-    #             yield bookmark.events.pop(0)
+#     # def collect_new_events(self):
+#     #     for recommendation in self.recommendation.seen:
+#     #         while bookmark.events:
+#     #             yield bookmark.events.pop(0)
 
-    @abstractmethod
-    def _commit(self):
-        raise NotImplementedError
+#     @abstractmethod
+#     def _commit(self):
+#         raise NotImplementedError
 
-    @abstractmethod
-    def rollback(self):
-        raise NotImplementedError
+#     @abstractmethod
+#     def rollback(self):
+#         raise NotImplementedError
 
 
 DEFAULT_SESSION_FACTORY = sessionmaker(
@@ -51,7 +51,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 
     def __enter__(self):
         self.session = self.session_factory()  # type: Session
-        self.recommendations = repository.RecommendationRepository(self.session)
+        self.recommendation = repository.RecommendationRepository(self.session)
         return super().__enter__()
 
     def __exit__(self, *args):
@@ -65,13 +65,13 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.session.rollback()
 
 
-class FakeUnitOfWork(AbstractUnitOfWork):
-    def __init__(self):
-        self.recommendation = repository.RecommendationRepository(recommendations = [])
-        self.committed = False
+# class FakeUnitOfWork(AbstractUnitOfWork):
+#     def __init__(self):
+#         self.recommendation = repository.RecommendationRepository(recommendations = [])
+#         self.committed = False
 
-    def _commit(self):
-        self.committed = True
+#     def _commit(self):
+#         self.committed = True
 
-    def rollback(self):
-        pass
+#     def rollback(self):
+#         pass

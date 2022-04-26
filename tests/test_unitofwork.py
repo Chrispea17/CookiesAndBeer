@@ -31,13 +31,13 @@ def test_can_retrieve_recommendation(sqlite_session_factory):
     nu: datetime = datetime(2022, 4, 24, 0,0, 0, 0, tzinfo=timezone.utc)
     insert_recommendation(session, f"pizza", f"Betty-George", nu.isoformat(), f"http://example.com")
     session.commit()
+    recommendation: Recommendation = None
 
     uow = unitofwork.SqlAlchemyUnitOfWork(sqlite_session_factory)
 
     with uow: 
-        recommendationlist = uow.recommendations.get(reference=0) 
-        uow.commit()
-        assert recommendationlist ==[]
+        print (uow.recommendation.session.get(recommendation,0))
+        assert uow ==0
 
 
 def get_recommendation(session, reference):
@@ -48,16 +48,16 @@ def get_recommendation(session, reference):
     return itemID
 
 
-def test_uow_can_retrieve_a_recommendation_item(sqlite_session_factory):
-    session = sqlite_session_factory()
-    nu: datetime = datetime(2022, 4, 24, 0,0, 0, 0, tzinfo=timezone.utc)
-    insert_recommendation(session, f"pizza", f"Betty-George", nu.isoformat(), f"http://example.com")
-    session.commit()
+# def test_uow_can_retrieve_a_recommendation_item(sqlite_session_factory):
+#     session = sqlite_session_factory()
+#     nu: datetime = datetime(2022, 4, 24, 0,0, 0, 0, tzinfo=timezone.utc)
+#     insert_recommendation(session, f"pizza", f"Betty-George", nu.isoformat(), f"http://example.com")
+#     session.commit()
 
-    uow = unitofwork.SqlAlchemyUnitOfWork(sqlite_session_factory)
-    with uow:
-        recommendation = uow.recommendations.get(reference="0")
-        uow.commit()
+#     uow = unitofwork.SqlAlchemyUnitOfWork(sqlite_session_factory)
+#     with uow:
+#         recommendation = uow.recommendation.get(reference="0")
+#         uow.commit()
 
-    rec = get_recommendation(sqlite_session_factory, "0")
-    assert rec == "pizza"
+#     rec = get_recommendation(sqlite_session_factory, "0")
+#     assert rec == "pizza"

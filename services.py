@@ -6,9 +6,9 @@ from difflib import Match
 from recommendations import Recommendation, MatchUsers, User
 
 
-def setRating(response: str, recommendations: list[Recommendation], reference) -> int:
-    for recs in recommendations:
-        if recs.reference == reference:
+def setRating(response: str, data: list[Recommendation], reference) -> int:
+    for recs in data:
+        if (recs.reference == reference):
             recs.setRating(response)
             return recs._recommendationRating
 
