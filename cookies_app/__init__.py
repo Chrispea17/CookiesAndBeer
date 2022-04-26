@@ -1,10 +1,28 @@
+import os
+from pickle import TRUE
+from flask import Flask, jsonify, request
+
 from datetime import datetime
 import json
 import commands
 
-from flask import Flask, jsonify, request
-
 app = Flask(__name__)
+
+def create_app(test_config=None):
+    #create and configure my app
+    app = Flask(__name__, instance_relative_config=True)
+    app.config.from_mapping(SECRET_KEY='dev', DATABASE = os.path.join(app.instance_path, 'recommendations.sqlite'))
+
+    if test_config is None:
+        app.config.from_pyfile('config.py', silent=TRUE)
+    else:
+        app.config.from_mapping(test_config)
+
+    try: 
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
+
 
 @app.route('/')
 def index():
@@ -17,13 +35,19 @@ def submit_recommendation():
 # @app.route('/view_item_recommendations/<id>', methods=['GET'])
 # def list_recommendations_by_itemID():
 
-@app.route('/add_recommendation', methods=['POST'])
-def add_confirm_and_remove_bookmark():
-    itemID: str
-    uniqueUserMatchID: str
-    findItem: str
-    date: str
 
+one_item_for_test = [{"itemID": "item-str",
+    "uniqueUserMatchID": "match-str",
+    "findItem": "url.str",
+    "date": "date-str"}] 
+
+@app.route('/add_recommendation', methods=['POST'])
+def add_recommendation():
+    return jsonify({"Recommendation": one_item_for_test})
+    # itemID: str
+    # uniqueUserMatchID: str
+    # findItem: str
+    # date: str
 
 #     # title, url, notes, date_added, date_edited
 #     data = request.get_json()
@@ -57,4 +81,4 @@ def add_confirm_and_remove_bookmark():
 #     pass
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=False,host='0.0.0.0')

@@ -5,7 +5,7 @@ from pathlib import Path
 import time
 import requests
 import config
-
+from cookies_app import create_app
 from orm import metadata, start_mappers
 
 
@@ -41,3 +41,7 @@ def restart_api():
     (Path(__file__).parent / "flaskapi.py").touch()
     time.sleep(0.5)
     wait_for_webapp_to_come_up()
+
+@pytest.fixture
+def client(create_app):
+    return create_app.test_client()

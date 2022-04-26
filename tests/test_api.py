@@ -23,23 +23,22 @@
 # import requests
 # from requests.adapters import HTTPAdapter, Retry
 
+from api import app
+
+def test_index_route():
+    response = app.test_client().get('/')
+
+    assert response.status_code == 200
+    assert response.data.decode('utf-8') == 'Testing, Flask!'
 
 
-import json
-import pytest
 
-from flask import request
-import cookiesandbeer
+# LOCALHOST = 'http://127.0.0.1:5000/'
 
-LOCALHOST = 'http://127.0.0.1:5000/'
 
-def test_api_can_connect():
-    res = request.get(LOCALHOST)
-    assert res != None
-
-def test_api_index():
-    res = request.get(LOCALHOST)
-    assert res != None
+# def test_api_index():
+#     res = request
+#     assert res != None
 
 # @pytest.mark.usefixtures('in_memory_sqlite_db')
 # def test_api_runs():
