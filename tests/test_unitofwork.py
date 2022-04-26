@@ -8,6 +8,7 @@ from unitofwork import AbstractUnitOfWork, FakeUnitOfWork
 import unitofwork
 
 def insert_recommendation(session, itemID, uniqueUserMatchID, date, findItem):
+
     session.execute(
         """
         INSERT INTO recommendations (date, uniqueUserMatchID, itemID, findItem)

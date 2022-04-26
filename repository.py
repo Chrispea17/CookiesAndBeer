@@ -1,12 +1,12 @@
 import abc
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 import orm
 from recommendations import Recommendation, Base
 import recommendations
 
 
 
-class AbstractRepository(abc.ABC):
+class AbstractRepository(ABC):
     def __init__(self):
         self.recommendations = set()
 
@@ -24,7 +24,7 @@ class RecommendationRepository(AbstractRepository):
         self.session = session
 
     def add(self, recommendation):
-            self.session.query(recommendation)
+            self.session.add(recommendation)
 
     def get(self, recommendation: Recommendation) ->list[Recommendation]:
         return self.session.query(Recommendation)

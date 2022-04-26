@@ -23,23 +23,21 @@ class AddRecommendationCommand(Command):
 
 
 
-# @dataclass
-# class ListRecommendationsCommand(Command):
-#     order_by: str
-#     order: str
+@dataclass
+class ListRecommendationsCommand(Command):
+    order_by: str
+    order: str
 
 
-# @dataclass
-# class DeleteBookmarkCommand(Command):
-#     id: int
+@dataclass
+class DeleteRecommendationCommand(Command):
+    reference: int
 
-
-# @dataclass
-# class EditBookmarkCommand(Command):
-#     id: int
-#     title: str
-#     url: str
-#     # data["date_added"] = datetime.utcnow().isoformat()
-#     date_added: str
-#     date_edited: str
-#     notes: Optional[str] = None
+@dataclass
+class EditRecommendationCommand(Command):
+    reference: int
+    itemID: str
+    url: str
+    uniqueUserMatchID: str
+    _rank: float
+    _recommendationgRating: int
