@@ -29,16 +29,16 @@ import json
 import pytest
 
 from flask import request
-
+import cookiesandbeer
 
 LOCALHOST = 'http://127.0.0.1:5000/'
 
 def test_api_can_connect():
-    res = requests.get(LOCALHOST)
+    res = request.get(LOCALHOST)
     assert res != None
 
 def test_api_index():
-    res = requests.get(LOCALHOST)
+    res = request.get(LOCALHOST)
     assert res != None
 
 # @pytest.mark.usefixtures('in_memory_sqlite_db')
