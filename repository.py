@@ -8,7 +8,7 @@ import recommendations
 
 class AbstractRepository(abc.ABC):
     def __init__(self):
-        self.bookmarks = set()
+        self.recommendations = set()
 
     @abc.abstractmethod
     def add(self, recommendation: Recommendation):
@@ -24,7 +24,7 @@ class RecommendationRepository(AbstractRepository):
         self.session = session
 
     def add(self, recommendation):
-            self.session.add(recommendation)
+            self.session.query(recommendation)
 
     def get(self, recommendation: Recommendation) ->list[Recommendation]:
         return self.session.query(Recommendation)

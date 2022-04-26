@@ -4,7 +4,7 @@
 
 from difflib import Match
 from recommendations import Recommendation, MatchUsers, User
-
+import unitofwork
 
 def setRating(response: str, data: list[Recommendation], reference) -> int:
     for recs in data:
@@ -84,3 +84,11 @@ def getRankedRecommendations(recommenders: list[User], recommendations: list[Rec
 # def printRankedRecommendations(rankedList):
 #     for items in rankedList:
 #         print(items)
+
+def add_recommendation(
+    itemID: str, uniqueUserMatchID: str, findItem: int, date: str,
+    uow: unitofwork.AbstractUnitOfWork):
+
+    with uow:
+        uow.recommendations.add(Recommendation(itemID,uniqueUserMatchID, findItem, date))
+        uow.commit()

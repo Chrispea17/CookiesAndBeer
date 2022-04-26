@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
-
+import orm, repository
 
 import config
 import repository
@@ -12,7 +12,7 @@ import repository
 
 
 class AbstractUnitOfWork(ABC):
-    recommendation: repository.RecommendationRepository
+    recommendations: repository.RecommendationRepository
 
     def __enter__(self) -> AbstractUnitOfWork:
         return self
@@ -51,7 +51,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 
     def __enter__(self):
         self.session = self.session_factory()  # type: Session
-        self.recommendation = repository.RecommendationRepository(self.session)
+        self.recommendations = repository.RecommendationRepository(self.session)
         return super().__enter__()
 
     def __exit__(self, *args):
@@ -65,13 +65,15 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.session.rollback()
 
 
-# class FakeUnitOfWork(AbstractUnitOfWork):
-#     def __init__(self):
-#         self.recommendation = repository.RecommendationRepository(recommendations = [])
-#         self.committed = False
+class FakeUnitOfWork(AbstractUnitOfWork):
+    def __init__(self, session_factory=DEFAULT_SESSION_FACTORY):
+        self.session_factory = session_factory
 
-#     def _commit(self):
-#         self.committed = True
+        self.recommendations = repository.RecommendationRepository(self.session_factory)
+        self.committed = False
 
-#     def rollback(self):
-#         pass
+    def _commit(self):
+        self.committed = True
+
+    def rollback(self):
+        pass

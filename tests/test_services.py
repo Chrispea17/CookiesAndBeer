@@ -1,6 +1,7 @@
 from recommendations import *
-from services import setRating, sumRatings, setRank, countRecommendationsForMatch,getRecommendersForItem, getRankedRecommendations
-
+from services import setRating, sumRatings, setRank, countRecommendationsForMatch,getRecommendersForItem, getRankedRecommendations, add_recommendation
+import services
+from unitofwork import AbstractUnitOfWork
 
 def test_set_rating_on_particular_recommendation():
     recommendation1 = Recommendation("1234", "pizza", "getpizza.com", "7-12-1987", reference = 4)
@@ -237,3 +238,21 @@ def test_order_recommender_list_by_Rank():
         ["JoeHatesPizza", 'pizza', "yourmom.com"],
         ["MyNameSucks", 'pizza', "homemade.com"],
     ]
+
+class FakeUnitOfWork(AbstractUnitOfWork):
+    def __init__(self):
+        self.recommendation = repository.RecommendationRepository(recommendations = [])
+        self.committed = False
+
+    def _commit(self):
+        self.committed = True
+
+    def rollback(self):
+        pass
+
+
+def add_recommendation():
+    uow = FakeUnitOfWork()
+    services.add_recommendation("itemID-ID", "UniqueNameMatch","url.thingy","7-17-1987")
+    assert uow.recommendation.get(recommendation) is not None
+    assert uow.committed
