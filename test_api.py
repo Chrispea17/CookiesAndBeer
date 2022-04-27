@@ -30,9 +30,14 @@ def test_api_can_connect():
     res = requests.get(LOCALHOST)
     assert res != None
 
-@pytest.mark.usefixtures('restart_api')
-def test_happy_path_returns_200_or_201_and_recommendation(add_stock):
-
+# @pytest.mark.usefixtures('restart_api')
+# def test_happy_path_returns_200_or_201_and_recommendation(add_stock):
+# @pytest.mark.usefixtures('restart_api')
+# def test_api_returns_rankings(add_recommendation):
+#     first_recommendation = 
+#     second_recommnedation = 
+#     third_recommendation = 
+#     add_recommendation([])
 
 # @pytest.mark.usefixtures('in_memory_sqlite_db')
 # def test_api_runs():
