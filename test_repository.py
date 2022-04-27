@@ -6,15 +6,15 @@ import pytest
 from datetime import date
 import recommendations
 from sqlalchemy import update
-from repository import RecommendationRepository
+from repository import SqlAlchemyRepository
 from services import setRating, setRank
 
 # pytestmark = pytest.mark.usefixtures('mappers')
 
 def test_repo_can_save_a_recommendation(session):
     recommendation = recommendations.Recommendation(4,4,"url",date=date(2020,7,25))
-    repo = RecommendationRepository(session)
-    repo.add(recommendation)
+    repo = SqlAlchemyRepository(session)
+    repo._add(recommendation)
     session.commit()
 
     rows = list(session.execute(
@@ -39,7 +39,7 @@ def test_repo_can_save_a_recommendation(session):
 
 def test_repository_can_save_rating(session):
     recommendation = recommendations.Recommendation(4,4,"url",date=date(2020,7,25))
-    repo = RecommendationRepository(session)
+    repo = SqlAlchemyRepository(session)
     repo.add(recommendation)
     session.commit()
     reference=0
@@ -53,7 +53,7 @@ def test_repository_can_save_rating(session):
 
 def test_repository_can_save_rank(session):
     recommendation = recommendations.Recommendation(4,4,"url",date=date(2020,7,25))
-    repo = RecommendationRepository(session)
+    repo = SqlAlchemyRepository(session)
     repo.add(recommendation)
     session.commit()
     reference=0
@@ -65,4 +65,6 @@ def test_repository_can_save_rank(session):
         'SELECT uniqueUserMatchID, itemID, findItem, _recommendationRating FROM recommendations'
     ))
     assert list(rows) == [('4','4',"url", 1)]
+
+
 

@@ -1,6 +1,9 @@
-from numbers import Real
+
 from dataclasses import dataclass
 from abc import ABC, abstractmethod, abstractproperty
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 
 @dataclass
