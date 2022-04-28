@@ -23,6 +23,17 @@ def setRating(response: str, recommendations, reference) -> int:
             recs.setRating(response)
             return recs._recommendationRating
 
+# 
+# def uow_setRating(response: str, recommendations, reference, uow: AbstractUnitOfWork) -> int:
+#     with uow:
+#         for recs in recommendations:
+#             if recs.reference == reference:
+#                 new_rating = uow.recommendation.select_for_update(recs.reference)
+#                 new_rating.setRating(response,recs,recs.reference)
+#                 uow.commit()
+#                 return recs.reference
+
+        
 
 def countRecommendationsForMatch(data: list[Recommendation], uniqueUserMatch):
     count = 0

@@ -121,7 +121,11 @@ class AbstractRepository(ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, itemID) -> Recommendation:
+    def get(self, reference) -> Recommendation:
+        raise NotImplementedError
+    
+    @abc.abstractmethod
+    def select_for_update(self, reference)->Recommendation:
         raise NotImplementedError
 
 class SqlAlchemyRepository(AbstractRepository):
@@ -137,4 +141,6 @@ class SqlAlchemyRepository(AbstractRepository):
 
     def list(self):
         return self.session.query(Recommendation).all()
-        
+    
+    def select_for_update(self, reference) -> Recommendation:
+        return self.session.query(Recommendation).filter(Recommendation.reference==reference).one()

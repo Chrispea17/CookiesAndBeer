@@ -20,6 +20,9 @@ class FakeRepository(AbstractRepository):
 
     def list(self):
         return list(self._recommendations)
+    
+    def select_for_update(self, reference) -> Recommendation:
+        return self.session.query(Recommendation).filter(reference==reference).with_for_update().one()
 
 class FakeUnitOfWork(unitofwork.AbstractUnitOfWork):
     def __init__(self):
@@ -38,7 +41,7 @@ def test_add_recommendation():
     services.add_recommendation("1234", "pizza", "getpizza.com", "7-12-1987",uow)
     uow.commit()
     assert uow.recommendation.list() is not None
-    # assert uow._committed
+
 
 
 def test_set_rating_on_particular_recommendation():

@@ -32,18 +32,9 @@ def insert_recommendation(session):
             "Select itemID FROM recommendations WHERE uniqueUserMatchID=:uniqueUserMatchID",
             dict (uniqueUserMatchID= "Betty-John")
         )
-        
     return recommendation_id
 
-def test_repository_can_retrieve_a_recommendation(session):
-    insert_recommendation(session)
-    # print(recommendation_id) output ==1
-    repo=SqlAlchemyRepository(session)
-    retrieved = repo.list()
-    
-    expected = Recommendation("Betty-John","pizza","pizza.com","4-27-2022",reference=1)
-    assert isinstance(expected,Recommendation)
-    assert retrieved==[expected]
+
 
 def test_repository_can_save_rating(session):
     recommendation = recommendations.Recommendation(4,4,"url",date=date(2020,7,25))
