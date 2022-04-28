@@ -7,6 +7,7 @@ from gettext import find
 from recommendations import Recommendation, MatchUsers, User
 from unitofwork import AbstractUnitOfWork
 
+#uow service
 def add_recommendation(
     uniqueUserMatchID:str, itemID:str, findItem:str, date:str,
     uow: AbstractUnitOfWork):
@@ -18,20 +19,20 @@ def add_recommendation(
 
 def setRating(response: str, recommendations, reference) -> int:
     for recs in recommendations:
-        print(recs, recommendations)
         if recs.reference == reference:
             recs.setRating(response)
             return recs._recommendationRating
 
-# 
-# def uow_setRating(response: str, recommendations, reference, uow: AbstractUnitOfWork) -> int:
-#     with uow:
-#         for recs in recommendations:
-#             if recs.reference == reference:
-#                 new_rating = uow.recommendation.select_for_update(recs.reference)
-#                 new_rating.setRating(response,recs,recs.reference)
-#                 uow.commit()
-#                 return recs.reference
+# uow service 
+"""
+TODO:this is very wrong, need to save to match first then apply to rsting"""
+def uow_setRating(response: str, reference, uow: AbstractUnitOfWork) -> int:
+    with uow:
+        rated_recommend = uow.recommendations.select_for_update(reference)
+        rated_recommend.setRating(response)
+        uow.commit()
+        return rated_recommend._recommendationRating
+
 
         
 
@@ -51,22 +52,42 @@ def countRecommendationsForMatch(data: list[Recommendation], uniqueUserMatch):
 def sumRatings(data, uniqueusermatch):
     sum = 0
     for item in data:
+        print(item._recommendationRating)
+        print(sum)
         if (
             item.uniqueUserMatchID == uniqueusermatch
             and item._recommendationRating != None
             and item._recommendationRating == 1
         ):
             sum += 1
-        if sum == 0:
-            sum = None
+    if sum == 0:
+        sum = None
+    return sum
+
+#uow service
+def sumRatings(data, uniqueusermatch):
+    sum = 0
+    for item in data:
+        print(item._recommendationRating)
+        print(sum)
+        if (
+            item.uniqueUserMatchID == uniqueusermatch
+            and item._recommendationRating != None
+            and item._recommendationRating == 1
+        ):
+            sum += 1
+    if sum == 0:
+        sum = None
     return sum
 
 
-def setRank(data: list[Recommendation], id):
-    sum = sumRatings(data, id)
-    count = countRecommendationsForMatch(data, id)
+def setRank(data: list[Recommendation], matchid):
+    sum = sumRatings(data, matchid)
+    count = countRecommendationsForMatch(data, matchid)
     rank = sum / count
     return rank
+
+
 
 def getRecommendersForItem(recs : list[Recommendation], matches : list[MatchUsers], ItemId):
     recommendersList = []

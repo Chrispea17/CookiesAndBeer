@@ -144,3 +144,6 @@ class SqlAlchemyRepository(AbstractRepository):
     
     def select_for_update(self, reference) -> Recommendation:
         return self.session.query(Recommendation).filter(Recommendation.reference==reference).one()
+    
+    def filtered_list(self, itemID):
+        return self.session.query(Recommendation).filter(Recommendation.itemID==itemID).all()
