@@ -1,32 +1,38 @@
+from gettext import find
+from re import U
+import re
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, clear_mappers
 from pathlib import Path
 import time
 import requests
+from recommendations import Recommendation
 import config
-import flaskapi
+# import flaskapi
 from flask import Flask
 
 from orm import metadata, start_mappers
 
 
 @pytest.fixture
-def in_memory_sqlite_db():
+def in_memory_db():
     engine = create_engine("sqlite:///:memory:")
     metadata.create_all(engine)
     return engine
 
 
 @pytest.fixture
-def session(in_memory_sqlite_db):
+def sqlite_session_factory(in_memory_db):
     start_mappers()
-    yield sessionmaker(bind=in_memory_sqlite_db)()
+    yield sessionmaker(bind=in_memory_db)
     clear_mappers()
 
+
 @pytest.fixture
-def sqlite_session_factory(in_memory_sqlite_db):
-    yield sessionmaker(bind=in_memory_sqlite_db)
+def session(sqlite_session_factory):
+    return sqlite_session_factory()
+
 
 def wait_for_webapp_to_come_up():
     deadline = time.time() + 10
@@ -47,3 +53,38 @@ def restart_api():
     time.sleep(0.5)
     # wait_for_webapp_to_come_up()
 
+@pytest.fixture
+def add_ranking(session):
+    recommendations_added = set()
+    matches_added = set()
+
+
+    def _add_lines(lines):
+        for itemID, uniqueUserMatchID, findItem, date in lines:
+            session.execute(
+                "INSERT INTO recommendations (itemID, uniqueUserMatchID, findItem, date)"
+                " VALUES (:itemID, :uniqueUserMatchID, :findItem, :date)",
+                dict(itemID=itemID, uniqueUserMatchID=uniqueUserMatchID, findItem=findItem, date=date),
+            )
+            [[reference]] = session.execute(
+                "SELECT findItem FROM recommendations WHERE uniqueUserMatchID=:uniqueUserMatchID AND itemID=:itemID",
+                dict(uniqueUserMatchID=uniqueUserMatchID, itemID=itemID),
+            )
+            recommendations_added.add(reference)
+            matches_added.add(uniqueUserMatchID)
+
+        session.commit()
+
+    yield _add_lines
+
+    for item in recommendations_added:
+        session.execute(
+            "DELETE FROM recommendations WHERE itemID=:item",
+            dict(itemId=item),
+        )
+
+    for item in matches_added:
+        session.execute(
+            "DELETE FROM items WHERE itemName=:item", dict(itemName=item),
+        )
+        session.commit()

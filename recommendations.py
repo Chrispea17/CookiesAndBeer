@@ -1,9 +1,9 @@
-
+from __future__ import annotations
 from dataclasses import dataclass
 from abc import ABC, abstractmethod, abstractproperty
 from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
+# Base = declarative_base()
 
 
 @dataclass
@@ -27,6 +27,24 @@ class Recommendation:
         self.findItem = url
         self._recommendationRating: int = None
         self._rank = 0
+
+    def __repr__(self):
+        return f"Recommendation {self.reference}"
+
+    def __eq__(self, other):
+        if not isinstance(other,Recommendation):
+            return False
+        return other.reference == self.reference
+
+    def __hash__(self):
+        return hash(self.reference)
+
+    def __gt__(self, other):
+        if self._rank is None:
+            return False
+        if other._rank is None:
+            return True
+        return self._rank > other._rank
 
     # Note SHOULD PROBABLY DECOUPLE RATING AND RECOMMENDATION IN UPDATE#
     # allows a recommendation to be rated

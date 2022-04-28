@@ -20,9 +20,9 @@ def recommendation_list_endpoint():
     Recommendation.set(rating)
     #Rating gets stored and is used to calculate ranking for future set of recommendations
 """
-import re
+
 from xmlrpc.client import DateTime
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, MetaData, Float, Date
+from sqlalchemy import Table, Column, ForeignKey, Integer, String, Table, MetaData, Float, Date
 from sqlalchemy.orm import relationship, mapper 
 from abc import *
 from recommendations import *

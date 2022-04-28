@@ -3,11 +3,22 @@
 
 
 from difflib import Match
+from gettext import find
 from recommendations import Recommendation, MatchUsers, User
+from unitofwork import AbstractUnitOfWork
+
+def add_recommendation(
+    uniqueUserMatchID:str, itemID:str, findItem:str, date:str,
+    uow: AbstractUnitOfWork):
+
+    with uow:
+        uow.recommendation.add(Recommendation(uniqueUserMatchID,itemID,findItem,date))
+        uow.commit()
 
 
-def setRating(response: str, recommendations: list[Recommendation], reference) -> int:
+def setRating(response: str, recommendations, reference) -> int:
     for recs in recommendations:
+        print(recs, recommendations)
         if recs.reference == reference:
             recs.setRating(response)
             return recs._recommendationRating
@@ -26,7 +37,7 @@ def countRecommendationsForMatch(data: list[Recommendation], uniqueUserMatch):
     return count
 
 
-def sumRatings(data: list[Recommendation], uniqueusermatch):
+def sumRatings(data, uniqueusermatch):
     sum = 0
     for item in data:
         if (

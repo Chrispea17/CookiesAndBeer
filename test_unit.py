@@ -54,3 +54,11 @@ def test_get_user_from_input():
 def test_item_user_from_input():
     item = Item("Cookies")
     assert isinstance(item, Item)
+
+def test_set_rating_on_correct_recommendation():
+    recommendation1 = Recommendation(
+        "7-15-2022", "Jean-Joe", "cookies", "www.findyouritem.com")
+    recommendation2 = Recommendation(
+        "7-16-2022", "Jean-John", "cookies", "www.findyourcookie.com")
+    
+    

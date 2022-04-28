@@ -4,17 +4,18 @@
 # from sqlalchemy.orm import relationship, mapper
 import pytest
 from datetime import date
+from recommendations import Recommendation
 import recommendations
-from sqlalchemy import update
+from sqlalchemy import insert, update
 from repository import SqlAlchemyRepository
 from services import setRating, setRank
-
+from sqlalchemy.orm import Session
 # pytestmark = pytest.mark.usefixtures('mappers')
 
 def test_repo_can_save_a_recommendation(session):
     recommendation = recommendations.Recommendation(4,4,"url",date=date(2020,7,25))
     repo = SqlAlchemyRepository(session)
-    repo._add(recommendation)
+    repo.add(recommendation)
     session.commit()
 
     rows = list(session.execute(
@@ -22,20 +23,27 @@ def test_repo_can_save_a_recommendation(session):
     ))
     assert list(rows) == [('4','4',"url")]
 
-# def insert_rating(session,reference,_recommendationRating):
-#     dict(_recommendationRating=_recommendationRating, reference = reference)
-#     session.execute(
-#         "UPDATE recommendations"
-#         "SET _recommendationRating := _recommendationRating"
-#         'WHERE recommendation.reference :=reference',
-#     )
+def insert_recommendation(session):
+    session.execute(
+        "INSERT INTO recommendations (itemID, uniqueUserMatchID, findItem, date)"
+        'VALUES ("pizza", "Betty-John","pizza.com","2022-04-27")'
+    )
+    [[recommendation_id]] = session.execute(
+            "Select itemID FROM recommendations WHERE uniqueUserMatchID=:uniqueUserMatchID",
+            dict (uniqueUserMatchID= "Betty-John")
+        )
+        
+    return recommendation_id
 
-#     [[rank]] = session.execute(
-#         'SELECT id FROM items WHERE reference=:reference AND _recommendationRating=:_recommendationRating',
-#         dict(reference=1, _recommendationRating=0),
-#     )
-#     return rank
+def test_repository_can_retrieve_a_recommendation(session):
+    insert_recommendation(session)
+    # print(recommendation_id) output ==1
+    repo=SqlAlchemyRepository(session)
+    retrieved = repo.list()
     
+    expected = Recommendation("Betty-John","pizza","pizza.com","4-27-2022",reference=1)
+    assert isinstance(expected,Recommendation)
+    assert retrieved==[expected]
 
 def test_repository_can_save_rating(session):
     recommendation = recommendations.Recommendation(4,4,"url",date=date(2020,7,25))
@@ -43,8 +51,8 @@ def test_repository_can_save_rating(session):
     repo.add(recommendation)
     session.commit()
     reference=0
-    x = repo.get(reference)
-    x._recommendationRating = setRating("good",[x],reference)
+    x = repo.list()
+    x[0]._recommendationRating = setRating("good",x,reference)
     session.commit()
     rows = list(session.execute(
         'SELECT uniqueUserMatchID, itemID, findItem, _recommendationRating FROM recommendations'
@@ -57,10 +65,10 @@ def test_repository_can_save_rank(session):
     repo.add(recommendation)
     session.commit()
     reference=0
-    x = repo.get(reference)
-    x._recommendationRating = setRating("good",[x],reference)
+    x = repo.list()
+    x[0]._recommendationRating = setRating("good",x,reference)
     session.commit()
-    x._rank = setRank([x],recommendation.uniqueUserMatchID)
+    x[0]._rank = setRank(x,recommendation.uniqueUserMatchID)
     rows = list(session.execute(
         'SELECT uniqueUserMatchID, itemID, findItem, _recommendationRating FROM recommendations'
     ))

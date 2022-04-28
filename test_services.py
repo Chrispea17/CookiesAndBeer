@@ -1,5 +1,44 @@
+from multiprocessing.connection import wait
+import time
 from recommendations import *
 from services import setRating, sumRatings, setRank, countRecommendationsForMatch,getRecommendersForItem, getRankedRecommendations
+from repository import AbstractRepository
+import services, unitofwork
+
+
+#refactoring services for unit of work
+
+class FakeRepository(AbstractRepository):
+    def __init__(self,recommendations):
+        self._recommendations = set(recommendations)
+
+    def add(self, recommendation):
+        self._recommendations.add(recommendation)
+
+    def get(self,itemID):
+        return next(b for b in self._recommendations if b.itemID==itemID)
+
+    def list(self):
+        return list(self._recommendations)
+
+class FakeUnitOfWork(unitofwork.AbstractUnitOfWork):
+    def __init__(self):
+        self.recommendation = FakeRepository([])
+        self._committed = False
+
+    def commit(self):
+        self._commited = True
+
+    def rollback(self):
+        pass
+
+
+def test_add_recommendation():
+    uow = FakeUnitOfWork()
+    services.add_recommendation("1234", "pizza", "getpizza.com", "7-12-1987",uow)
+    uow.commit()
+    assert uow.recommendation.list() is not None
+    # assert uow._committed
 
 
 def test_set_rating_on_particular_recommendation():

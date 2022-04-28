@@ -8,18 +8,18 @@ from sqlalchemy.orm.session import Session
 import config
 import repository
 
-from recommendations import Recommendation
+
 
 
 class AbstractUnitOfWork(ABC):
-    recommendation: repository.SqlAlchemyRepository
+    recommendation: repository.AbstractRepository
 
     def __enter__(self) -> AbstractUnitOfWork:
         return self
 
     def __exit__(self, *args):
         self.rollback()
-
+    
     def commit(self):
         self._commit()
 
@@ -29,7 +29,7 @@ class AbstractUnitOfWork(ABC):
     #             yield bookmark.events.pop(0)
 
     @abstractmethod
-    def _commit(self):
+    def commit(self):
         raise NotImplementedError
 
     @abstractmethod
@@ -58,20 +58,20 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         super().__exit__(*args)
         self.session.close()
 
-    def _commit(self):
+    def commit(self):
         self.session.commit()
 
     def rollback(self):
         self.session.rollback()
 
 
-class FakeUnitOfWork(AbstractUnitOfWork):
-    def __init__(self):
-        self.recommendation = repository.SqlAlchemyRepository(recommendations = [])
-        self.committed = False
+# class FakeUnitOfWork(AbstractUnitOfWork):
+#     def __init__(self):
+#         self.recommendation = repository.SQ(recommendations = [])
+#         self.committed = False
 
-    def _commit(self):
-        self.committed = True
+#     def _commit(self):
+#         self.committed = True
 
-    def rollback(self):
-        pass
+#     def rollback(self):
+#         pass

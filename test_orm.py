@@ -36,9 +36,9 @@ def test_retrieving_recommendations(session):
     )
     expected = [
         recommendations.Recommendation(
-            "Shell-Silver", "cookies", "www.findyouritem.com", date=date(2020,7,25)),
+            "Shell-Silver", "cookies", "www.findyouritem.com", date=date(2020,7,25),reference=1),
         recommendations.Recommendation(
-            "Shell-Tina", "cookies", "www.findyourcookie.com",date=date(2020,2,2)),
+            "Shell-Tina", "cookies", "www.findyourcookie.com",date=date(2020,2,2),reference=2),
     ]
     assert session.query(recommendations.Recommendation).all() == expected
 
