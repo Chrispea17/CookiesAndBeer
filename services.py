@@ -61,8 +61,6 @@ def countRecommendationsForMatch(data: list[Recommendation], uniqueUserMatch):
 def sumRatings(data, uniqueusermatch):
     sum = 0
     for item in data:
-        print(item._recommendationRating)
-        print(sum)
         if (
             item.uniqueUserMatchID == uniqueusermatch
             and item._recommendationRating != None
@@ -74,26 +72,18 @@ def sumRatings(data, uniqueusermatch):
     return sum
 
 #uow service
-def sumRatings(data, uniqueusermatch):
-    sum = 0
-    for item in data:
-        print(item._recommendationRating)
-        print(sum)
-        if (
-            item.uniqueUserMatchID == uniqueusermatch
-            and item._recommendationRating != None
-            and item._recommendationRating == 1
-        ):
-            sum += 1
-    if sum == 0:
-        sum = None
-    return sum
 
+def setRank(data: list[Recommendation], matchid):
+        sum = sumRatings(data, matchid)
+        count = countRecommendationsForMatch(data, matchid)
+        rank = sum / count
+        return rank
 
-def setRank(data: list[Recommendation], matchid, uow : AbstractUnitOfWork):
+def setRank_uow(data: list[Recommendation], matchid, uow : AbstractUnitOfWork):
     with uow:
         sum = sumRatings(data, matchid)
         count = countRecommendationsForMatch(data, matchid)
+        uow.repo.get_match(matchid)
         rank = sum / count
         uow.commit()
         return rank
@@ -112,12 +102,12 @@ def getRecommendersForItem(recs : list[Recommendation], matches : list[MatchUser
     return recommendersList
 
 
-def getRankedRecommendations(recommenders: list[User], recommendations: list[Recommendation], matches: list[Match], item, requesterID):
+def getRankedRecommendations(recommenders: list[User], recommendations: list[Recommendation], matches: list[MatchUsers], item, requesterID):
     rankedList = []
     for recommendation in recommendations:
         if recommendation.itemID == item: #i should switch searching for user match before item for processing, but later
             for match in matches:
-                if match.reference == recommendation.uniqueUserMatchID and match.requester == requesterID:
+                if match.reference == recommendation.uniqueUserMatchID and match.RequesterID == requesterID:
                     recommendation._rank = match._rank
                     for recommender in recommenders:
                         if recommender.userName == match.getRecommender(match.reference):

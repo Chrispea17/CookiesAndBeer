@@ -2,9 +2,18 @@ from __future__ import annotations
 from dataclasses import dataclass
 from abc import ABC, abstractmethod, abstractproperty
 from sqlalchemy.ext.declarative import declarative_base
-
+from typing import List
 # Base = declarative_base()
 
+
+def setRank(recommendations: List[Recommendation], matchid):
+    count = 0
+    sum = 0
+    for recs in recommendations:
+        if recs.uniqueUserMatchID==matchid and recs._recommendationRating is not None :
+            count +=1
+            sum+= recs._recommendationRating
+    return sum/count
 
 @dataclass
 class Item:
@@ -56,17 +65,17 @@ class Recommendation:
 class MatchUsers:
     def __init__(self, RequesterID: str, RecommenderID: str, rank=0):
         self.reference = RequesterID + RecommenderID
-        self.requester = RequesterID
-        self.recommender = RecommenderID
+        self.RequesterID = RequesterID
+        self.RecommenderID = RecommenderID
         self._rank = rank
 
     def getRecommender(self, id):
         if self.reference == id:
-            return self.recommender
+            return self.RecommenderID
 
     def getRequester(self, id):
         if self.reference == id:
-            return self.requester
+            return self.RequesterID
     
     def setRank(self, rank, id):
         if self.reference == id: 

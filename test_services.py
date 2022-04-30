@@ -1,5 +1,6 @@
 from multiprocessing.connection import wait
 import time
+from conftest import sqlite_session_factory
 from recommendations import *
 from services import setRating, sumRatings, setRank, countRecommendationsForMatch,getRecommendersForItem, getRankedRecommendations, add_recommendation
 from repository import AbstractRepository
@@ -20,7 +21,7 @@ class FakeRepository(AbstractRepository):
     def get(self,itemID):
         return next(b for b in self._recommendations if b.itemID==itemID)
 
-    def list(self):
+    def list_recommendations(self):
         return list(self._recommendations)
     
     def select_for_update(self, reference) -> Recommendation:
@@ -35,11 +36,14 @@ class FakeRepository(AbstractRepository):
     def get_match(self,reference):
         return next(b for b in self._match if b.reference==reference)
 
-    def list_match(self):
+    def list_matches(self):
         return list(self._matches)
     
     def select_for_update_match(self, reference) -> MatchUsers:
         return self.session.query(MatchUsers).filter(reference==reference).with_for_update().one()
+
+    def list_rated_recommendations(self):
+        return self.session.query(Recommendation).filter(Recommendation._recommendationRating!=None).all()
 
 class FakeUnitOfWork(unitofwork.AbstractUnitOfWork):
     def __init__(self):
@@ -63,22 +67,8 @@ def test_add_User_Match():
     uow = FakeUnitOfWork()
     services.add_userMatch("Carol","Mark",uow)
     uow.commit()
-    assert uow.repo.list_match() is not None
+    assert uow.repo.list_matches() is not None
 
-
-def test_set_ranking_for_usermatch():
-    uow = FakeUnitOfWork()
-    services.add_recommendation("bettygeorge", "pizza", "getpizza.com", "7-12-1987", uow,recommendationRating=1)
-    # services.add_recommendation("bettygeorge", "icecream", "geticecream.com", "7-12-1997",uow,recommendationRating=0)
-    # services.add_recommendation("bettygeorge", "jello", "getjello.com", "7-12-1987",uow, recommendationRating=0)
-    # services.add_recommendation("bettygeorge", "beer", "getbeer.com", "7-12-1997",uow, recommendationRating=0)
-    # services.add_userMatch("betty","george", uow)
-    uow.commit()
-
-    with uow:
-        assert uow.repo.list
-        # recommendation_list=uow.repo.select_for_update_match("bettygeorge")
-        # services.setRank(recommendation_list,"bettygeorge",uow)
 
     
 

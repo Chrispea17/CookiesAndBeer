@@ -46,7 +46,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 
     def __enter__(self):
         self.session = self.session_factory()  # type: Session
-        self.recommendations = repository.SqlAlchemyRepository(self.session)
+        self.repo = repository.SqlAlchemyRepository(self.session)
         return super().__enter__()
 
     def __exit__(self, *args):
@@ -60,67 +60,9 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.session.rollback()
 
 
-# class AbstractMatchUnitOfWork(ABC):
-#     repo = repository.AbstractRepository
-
-#     def __enter__(self) -> AbstractMatchUnitOfWork:
-#         return self
-
-#     def __exit__(self, *args):
-#         self.rollback()
-    
-#     def commit(self):
-#         self._commit()
-
-    # def collect_new_events(self):
-    #     for recommendation in self.recommendation.seen:
-    #         while bookmark.events:
-    #             yield bookmark.events.pop(0)
-
-    # @abstractmethod
-    # def commit(self):
-    #     raise NotImplementedError
-
-    # @abstractmethod
-    # def rollback(self):
-    #     raise NotImplementedError
-
-
 DEFAULT_SESSION_FACTORY = sessionmaker(
     bind=create_engine(
         config.get_sqlite_file_url(),
         isolation_level="SERIALIZABLE",
     )
 )
-
-# class SqlAlchemyMatchUnitOfWork(AbstractMatchUnitOfWork):
-
-#     def __init__(self, session_factory=DEFAULT_SESSION_FACTORY):
-#         self.session_factory = session_factory
-
-#     def __enter__(self):
-#         self.session = self.session_factory()  # type: Session
-#         self.matches = repository.SqlAlchemyMatchRepository(self.session)
-#         return super().__enter__()
-
-#     def __exit__(self, *args):
-#         super().__exit__(*args)
-#         self.session.close()
-
-#     def commit(self):
-#         self.session.commit()
-
-#     def rollback(self):
-#         self.session.rollback()
-
-
-# class FakeUnitOfWork(AbstractUnitOfWork):
-#     def __init__(self):
-#         self.recommendation = repository.SQ(recommendations = [])
-#         self.committed = False
-
-#     def _commit(self):
-#         self.committed = True
-
-#     def rollback(self):
-#         pass

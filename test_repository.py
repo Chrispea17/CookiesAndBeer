@@ -4,7 +4,7 @@
 # from sqlalchemy.orm import relationship, mapper
 import pytest
 from datetime import date
-from recommendations import Recommendation
+from recommendations import Recommendation, MatchUsers
 import recommendations
 from sqlalchemy import insert, update
 from repository import SqlAlchemyRepository
@@ -42,7 +42,7 @@ def test_repository_can_save_rating(session):
     repo.add(recommendation)
     session.commit()
     reference=0
-    x = repo.list()
+    x = repo.list_recommendations()
     x[0]._recommendationRating = setRating("good",x,reference)
     session.commit()
     rows = list(session.execute(
@@ -56,7 +56,7 @@ def test_repository_can_save_rank(session):
     repo.add(recommendation)
     session.commit()
     reference=0
-    x = repo.list()
+    x = repo.list_recommendations()
     x[0]._recommendationRating = setRating("good",x,reference)
     session.commit()
     x[0]._rank = setRank(x,recommendation.uniqueUserMatchID)
@@ -66,13 +66,13 @@ def test_repository_can_save_rank(session):
     assert list(rows) == [('4','4',"url", 1)]
 
 def test_repo_can_save_a_match(session):
-    match = recommendations.Recommendation(4,4,"url",date=date(2020,7,25))
-    repo = SqlAlchemyMatchRepository(session)
-    repo.add(match)
+    match = MatchUsers("curtis","christine")
+    repo = SqlAlchemyRepository(session)
+    repo.add_match(match)
     session.commit()
 
     rows = list(session.execute(
-        'SELECT uniqueUserMatchID, itemID, findItem FROM recommendations'
+        'SELECT Requesterid, RecommenderID, reference FROM match_users'
     ))
-    assert list(rows) == [('4','4',"url")]
+    assert list(rows) == [("curtis","christine","curtischristine")]
 
