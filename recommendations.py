@@ -19,14 +19,14 @@ class User:
 
 @dataclass
 class Recommendation:
-    def __init__(self, matchid : str, itemID: str, url: str, date: str, rating = None, reference = 0):
+    def __init__(self, matchid : str, itemID: str, url: str, date: str, rating = None, reference = 0 , rank = 0):
         self.reference = reference
         self.date = date
         self.uniqueUserMatchID = matchid
         self.itemID = itemID
         self.findItem = url
-        self._recommendationRating: int = None
-        self._rank = 0
+        self._recommendationRating: int = rating
+        self._rank = rank
 
     def __repr__(self):
         return f"Recommendation {self.reference}"
@@ -58,7 +58,7 @@ class MatchUsers:
         self.reference = RequesterID + RecommenderID
         self.requester = RequesterID
         self.recommender = RecommenderID
-        self._rank = 0
+        self._rank = rank
 
     def getRecommender(self, id):
         if self.reference == id:

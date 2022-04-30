@@ -65,5 +65,14 @@ def test_repository_can_save_rank(session):
     ))
     assert list(rows) == [('4','4',"url", 1)]
 
+def test_repo_can_save_a_match(session):
+    match = recommendations.Recommendation(4,4,"url",date=date(2020,7,25))
+    repo = SqlAlchemyMatchRepository(session)
+    repo.add(match)
+    session.commit()
 
+    rows = list(session.execute(
+        'SELECT uniqueUserMatchID, itemID, findItem FROM recommendations'
+    ))
+    assert list(rows) == [('4','4',"url")]
 

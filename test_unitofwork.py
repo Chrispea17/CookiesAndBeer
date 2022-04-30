@@ -3,7 +3,7 @@ import pytest
 from services import setRating, setRank, uow_setRating
 # from CookiesAndBeer.unitofwork import FakeUnitOfWork
 
-from recommendations import Recommendation
+from recommendations import Recommendation, MatchUsers
 import unitofwork
 
 
@@ -21,6 +21,18 @@ def insert_recommendation(session, itemID, uniqueUserMatchID, date, findItem):
         ),
     )
 
+def insert_userMatch(session, RequesterID, RecommenderID):
+    session.execute(
+        """
+        INSERT INTO match_users (reference, RequesterID, RecommenderID)
+        VALUES(:reference,:RequesterID,:RecommenderID)
+        """,
+            dict(reference = RequesterID + RecommenderID,
+            RequesterID=RequesterID, 
+            RecommenderID=RecommenderID,
+        ),
+    )
+
 def get_rating(session, reference):
     [[recommendationrating]]=session.execute(
         'SELECT _recommendationRating FROM recommendations WHERE reference=:reference',
@@ -28,7 +40,8 @@ def get_rating(session, reference):
     )
     return recommendationrating
 
-def get_raking(session, uniqueUserMatchID):
+#this is messed up because i need to persist the rank for the user match instad of the recommendation. The rank doesn't change for every recommendation so it should not be given more reasons to change than it needs
+def get_ranking(session, uniqueUserMatchID):
     [[recommendationrating]]=session.execute(
         'SELECT Avg(_recommendationRating) FROM recommendations WHERE uniqueUserMatchID=:uniqueUserMatchID',
         dict(uniqueUserMatchID=uniqueUserMatchID),
@@ -49,7 +62,20 @@ def test_can_retrieve_recommendation(sqlite_session_factory):
         recommendation = uow.recommendations.list()[0]
         assert recommendation.itemID=="pizza"
 
+def test_can_retrieve_userMatch(sqlite_session_factory):
+    session = sqlite_session_factory()
+    insert_userMatch(session, f"Betty", f"George")
+    session.commit()
 
+    matches: MatchUsers = None
+    uow = unitofwork.SqlAlchemyMatchUnitOfWork(sqlite_session_factory)
+
+    with uow: 
+        match = uow.matches.list()[0]
+        print(match.reference)
+        assert match.reference=="BettyGeorge"
+
+    
 def get_recommendation(session, reference):
     [[itemID]] = session.execute(
         "SELECT itemID FROM recommendations WHERE reference=:reference",
@@ -92,7 +118,7 @@ def test_select_for_update(sqlite_session_factory):
     assert rate==0
 
 def test_select_for_update_uow_setRating(sqlite_session_factory):
-    session = sqlite_session_factory()
+    session = sqlite_session_factory()   
     nu: datetime = datetime(2022, 4, 24, 0,0, 0, 0, tzinfo=timezone.utc)
     nu2: datetime = datetime(2022, 4, 25, 0,0, 0, 0, tzinfo=timezone.utc)
     nu3: datetime = datetime(2022, 4, 26, 0,0, 0, 0, tzinfo=timezone.utc)

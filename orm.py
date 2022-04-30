@@ -43,6 +43,7 @@ recommendations = Table(
 match_users = Table(
     "match_users", metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("reference", Integer),
     Column("RequesterID", String(255)),
     Column("RecommenderID", String(255)),
     Column("_rank", Float),

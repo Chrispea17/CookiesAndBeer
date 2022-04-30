@@ -4,18 +4,27 @@
 
 from difflib import Match
 from gettext import find
+
 from recommendations import Recommendation, MatchUsers, User
 from unitofwork import AbstractUnitOfWork
 
+
 #uow service
 def add_recommendation(
-    uniqueUserMatchID:str, itemID:str, findItem:str, date:str,
+    uniqueUserMatchID:str, itemID:str, findItem:str, date : str, uow: AbstractUnitOfWork, recommendationRating : int =None, rank : float = 0,
+    ):
+
+    with uow:
+        uow.repo.add(Recommendation(uniqueUserMatchID,itemID,findItem,date,uow,recommendationRating,rank))
+        uow.commit()
+
+def add_userMatch(
+    RequesterID : str, RecommenderID : str,
     uow: AbstractUnitOfWork):
 
     with uow:
-        uow.recommendation.add(Recommendation(uniqueUserMatchID,itemID,findItem,date))
+        uow.repo.add_match(MatchUsers(RequesterID=RequesterID,RecommenderID=RecommenderID))
         uow.commit()
-
 
 def setRating(response: str, recommendations, reference) -> int:
     for recs in recommendations:
@@ -25,10 +34,10 @@ def setRating(response: str, recommendations, reference) -> int:
 
 # uow service 
 """
-TODO:this is very wrong, need to save to match first then apply to rsting"""
+TODO:this is very wrong, need to save to match first then apply to rating"""
 def uow_setRating(response: str, reference, uow: AbstractUnitOfWork) -> int:
     with uow:
-        rated_recommend = uow.recommendations.select_for_update(reference)
+        rated_recommend = uow.repo.select_for_update(reference)
         rated_recommend.setRating(response)
         uow.commit()
         return rated_recommend._recommendationRating
@@ -81,11 +90,13 @@ def sumRatings(data, uniqueusermatch):
     return sum
 
 
-def setRank(data: list[Recommendation], matchid):
-    sum = sumRatings(data, matchid)
-    count = countRecommendationsForMatch(data, matchid)
-    rank = sum / count
-    return rank
+def setRank(data: list[Recommendation], matchid, uow : AbstractUnitOfWork):
+    with uow:
+        sum = sumRatings(data, matchid)
+        count = countRecommendationsForMatch(data, matchid)
+        rank = sum / count
+        uow.commit()
+        return rank
 
 
 

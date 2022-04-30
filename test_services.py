@@ -1,16 +1,18 @@
 from multiprocessing.connection import wait
 import time
 from recommendations import *
-from services import setRating, sumRatings, setRank, countRecommendationsForMatch,getRecommendersForItem, getRankedRecommendations
+from services import setRating, sumRatings, setRank, countRecommendationsForMatch,getRecommendersForItem, getRankedRecommendations, add_recommendation
 from repository import AbstractRepository
-import services, unitofwork
+import services
+import unitofwork
 
 
 #refactoring services for unit of work
 
 class FakeRepository(AbstractRepository):
-    def __init__(self,recommendations):
+    def __init__(self,recommendations,matches):
         self._recommendations = set(recommendations)
+        self._matches = set(matches)
 
     def add(self, recommendation):
         self._recommendations.add(recommendation)
@@ -24,13 +26,28 @@ class FakeRepository(AbstractRepository):
     def select_for_update(self, reference) -> Recommendation:
         return self.session.query(Recommendation).filter(reference==reference).with_for_update().one()
 
+    def filtered_recommendation_list(self, uniqueUserMatch):
+        return self.session.query(Recommendation).filter(Recommendation.uniqueUserMatchID==uniqueUserMatch).all()
+
+    def add_match(self, match):
+        self._matches.add(match)
+
+    def get_match(self,reference):
+        return next(b for b in self._match if b.reference==reference)
+
+    def list_match(self):
+        return list(self._matches)
+    
+    def select_for_update_match(self, reference) -> MatchUsers:
+        return self.session.query(MatchUsers).filter(reference==reference).with_for_update().one()
+
 class FakeUnitOfWork(unitofwork.AbstractUnitOfWork):
     def __init__(self):
-        self.recommendation = FakeRepository([])
+        self.repo = FakeRepository([],[])
         self._committed = False
 
     def commit(self):
-        self._commited = True
+        self._committed = True
 
     def rollback(self):
         pass
@@ -40,9 +57,30 @@ def test_add_recommendation():
     uow = FakeUnitOfWork()
     services.add_recommendation("1234", "pizza", "getpizza.com", "7-12-1987",uow)
     uow.commit()
-    assert uow.recommendation.list() is not None
+    assert uow.repo.list_recommendations() is not None
+
+def test_add_User_Match():
+    uow = FakeUnitOfWork()
+    services.add_userMatch("Carol","Mark",uow)
+    uow.commit()
+    assert uow.repo.list_match() is not None
 
 
+def test_set_ranking_for_usermatch():
+    uow = FakeUnitOfWork()
+    services.add_recommendation("bettygeorge", "pizza", "getpizza.com", "7-12-1987", uow,recommendationRating=1)
+    # services.add_recommendation("bettygeorge", "icecream", "geticecream.com", "7-12-1997",uow,recommendationRating=0)
+    # services.add_recommendation("bettygeorge", "jello", "getjello.com", "7-12-1987",uow, recommendationRating=0)
+    # services.add_recommendation("bettygeorge", "beer", "getbeer.com", "7-12-1997",uow, recommendationRating=0)
+    # services.add_userMatch("betty","george", uow)
+    uow.commit()
+
+    with uow:
+        assert uow.repo.list
+        # recommendation_list=uow.repo.select_for_update_match("bettygeorge")
+        # services.setRank(recommendation_list,"bettygeorge",uow)
+
+    
 
 def test_set_rating_on_particular_recommendation():
     recommendation1 = Recommendation("1234", "pizza", "getpizza.com", "7-12-1987", reference = 4)
