@@ -2,11 +2,9 @@
 # The next is using all previous recommendations to calculate the rank of each new person giving a recommendation and including those who have never given a recommendation before
 
 
-from difflib import Match
-from gettext import find
-
-from recommendations import Recommendation, MatchUsers, User
+from recommendations import Recommendation, MatchUsers, User, SameRecommendations, not_same_recommendation
 from unitofwork import AbstractUnitOfWork
+from typing import List
 
 
 #uow service
@@ -15,8 +13,13 @@ def add_recommendation(
     ):
 
     with uow:
-        uow.repo.add(Recommendation(uniqueUserMatchID,itemID,findItem,date,uow,recommendationRating,rank))
-        uow.commit()
+        rec = Recommendation(uniqueUserMatchID,itemID,findItem,date,uow,recommendationRating,rank)
+        list_recs = uow.repo.list_recommendations()
+        try:
+            not_same_recommendation(rec, list_recs,rec.itemID)
+            uow.commit()
+        except StopIteration:
+            raise SameRecommendations(f"{Recommendation.findItem} has already been suggested.")
 
 def add_userMatch(
     RequesterID : str, RecommenderID : str,

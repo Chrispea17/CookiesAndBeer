@@ -5,9 +5,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from typing import List
 # Base = declarative_base()
 
-class NoSameRecommendations(Exception):
-    print("Someone else has submitted that suggestion")
+class SameRecommendations(Exception):
     pass
+
+def not_same_recommendation(recommendation: Recommendation, recommendations: List[Recommendation], item):
+    return recommendation.findItem not in {r.findItem for r in recommendations if r.itemID==item}
 
 def setRank(recommendations: List[Recommendation], matchid):
     count = 0
@@ -20,6 +22,18 @@ def setRank(recommendations: List[Recommendation], matchid):
         recs._rank = sum/count
     return sum/count
 
+
+    # recs_for_item = [recommendation.findItem]
+    # if recommendation.itemID == item:
+    #     for recs in recommendations: 
+    #             if recs.itemID == item:
+    #                 recs_for_item.append(recs.findItem)
+    #                 print(recs_for_item)
+    #                 print(set(recs_for_item))
+    #                 if len(recs_for_item) ==len(set(recs_for_item)):
+    #                     continue
+    #                 else:
+    #                     return len(recs_for_item) ==len(set(recs_for_item))                
 
 @dataclass
 class Item:

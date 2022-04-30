@@ -1,14 +1,12 @@
 from datetime import datetime, timezone
 import pytest
 from unitofwork import SqlAlchemyUnitOfWork
-from services import setRank_uow
 from conftest import sqlite_session_factory
 # from services import setRating, setRank, uow_setRating, add_recommendation, add_userMatch, getRankedRecommendations, getRecommendersForItem
 # from CookiesAndBeer.unitofwork import FakeUnitOfWork
-
-from recommendations import Recommendation, MatchUsers, setRank 
+from recommendations import Recommendation, MatchUsers, setRank, SameRecommendations, not_same_recommendation
 import unitofwork
-import services
+
 
 
 def insert_recommendation(session, itemID, uniqueUserMatchID, date, findItem, _recommendationRating = None, _rank = 0):
@@ -38,6 +36,13 @@ def insert_userMatch(session, RequesterID, RecommenderID):
             RecommenderID=RecommenderID,
         ),
     )
+
+def get_requester_from_usermatch(session, reference):
+    [[requesterID]] = session.execute(
+        'SELECT RequesterID FROM match_users WHERE reference=:reference',
+        dict(reference=reference)
+    )
+    return requesterID
 
 
 def get_rating(session, reference):
@@ -98,7 +103,6 @@ def test_can_retrieve_userMatch(sqlite_session_factory):
         print(match.reference)
         assert match.reference=="BettyGeorge"
 
-    
 
 def test_set_ranking_for_usermatch(sqlite_session_factory):
     session = sqlite_session_factory()
@@ -191,3 +195,25 @@ def test_return_list_by_rank(sqlite_session_factory):
         ranked_recommenders = uow.repo.list_ordered_ranked_recommendations("ice cream")
         expected = [get_recommendation(session, 1),get_recommendation(session, 4)]
         assert ranked_recommenders==expected
+
+def test_same_recommendation_raises_exception_and_rollsback(sqlite_session_factory):
+    class MyException(Exception):
+        pass
+    session = sqlite_session_factory()
+    nu: datetime = datetime(2022, 4, 24, 0,0, 0, 0, tzinfo=timezone.utc)
+    insert_userMatch(session,"betty","george")
+    insert_userMatch(session, "betty","john")
+    insert_recommendation(session, f"beer",f"bettyjohn", nu.isoformat(), f"getbeer.com",_recommendationRating=0)
+    session.commit()
+
+    uow = unitofwork.SqlAlchemyUnitOfWork(sqlite_session_factory)
+    with pytest.raises(SameRecommendations):
+        with uow:
+            new_rec = Recommendation(f"bettyphillip", f"beer",f"getbeer.com",nu.isoformat())
+            list_recs = uow.repo.list_recommendations()
+            print(not_same_recommendation(new_rec,list_recs,new_rec.itemID))
+            if not not_same_recommendation(new_rec,list_recs,new_rec.itemID):
+                raise SameRecommendations()
+    new_session = sqlite_session_factory()
+    rows = list(new_session.execute('SELECT itemID, findItem, uniqueUserMatchID FROM recommendations'))
+    assert rows == [get_recommendation(session,1)]

@@ -88,3 +88,5 @@ def add_ranking(session):
             "DELETE FROM items WHERE itemName=:item", dict(itemName=item),
         )
         session.commit()
+
+    

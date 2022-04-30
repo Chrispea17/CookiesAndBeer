@@ -58,7 +58,7 @@ class SqlAlchemyRepository(AbstractRepository):
         self.session.commit()
     
     def get(self,reference):
-        return self.session.query(Recommendation).filter(Recommendation.reference==reference)
+        return self.session.query(Recommendation).filter(Recommendation.reference==reference).one()
 
     def list_recommendations(self):
         return self.session.query(Recommendation).all()
