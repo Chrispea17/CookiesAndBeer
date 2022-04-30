@@ -5,6 +5,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from typing import List
 # Base = declarative_base()
 
+class NoSameRecommendations(Exception):
+    print("Someone else has submitted that suggestion")
+    pass
 
 def setRank(recommendations: List[Recommendation], matchid):
     count = 0
@@ -17,6 +20,7 @@ def setRank(recommendations: List[Recommendation], matchid):
         recs._rank = sum/count
     return sum/count
 
+
 @dataclass
 class Item:
     Name: str
@@ -27,6 +31,7 @@ class Item:
 class User:
     userName: str
 # this will eventually have data added, like first name, last name, possibly a hashed password, profile information, photo, etc
+
 
 @dataclass
 class Recommendation:
@@ -66,6 +71,7 @@ class Recommendation:
     def setRating(self, response: str) -> int:
         ratings = {"good": 1, "bad": 0}
         self._recommendationRating = ratings[response]
+    
 
 
 class MatchUsers:
@@ -88,8 +94,15 @@ class MatchUsers:
             self._rank = rank
     
 
+#My Aggregate
+class Suggestions:
+    def __init__(self, item: str, recommendations:List[Recommendation]):
+        self.item = item
+        self.recommendations = recommendations
 
-
+    def same_recommendation(self, item, finditem, otherrecommendation):
+        if self.item == otherrecommendation.item and self.findItem ==otherrecommendation.findItem:
+            raise NoSameRecommendations
 
 
 
