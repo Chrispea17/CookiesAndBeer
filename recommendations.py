@@ -13,6 +13,8 @@ def setRank(recommendations: List[Recommendation], matchid):
         if recs.uniqueUserMatchID==matchid and recs._recommendationRating is not None :
             count +=1
             sum+= recs._recommendationRating
+    for recs in recommendations:
+        recs._rank = sum/count
     return sum/count
 
 @dataclass
@@ -54,6 +56,10 @@ class Recommendation:
         if other._rank is None:
             return True
         return self._rank > other._rank
+
+    def setRank(self, rank, id):
+        if self.reference == id: 
+            self._rank = rank
 
     # Note SHOULD PROBABLY DECOUPLE RATING AND RECOMMENDATION IN UPDATE#
     # allows a recommendation to be rated

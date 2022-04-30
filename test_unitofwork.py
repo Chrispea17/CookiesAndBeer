@@ -49,6 +49,7 @@ def get_rating(session, reference):
 
 def setRating(session,response):
     uow = SqlAlchemyUnitOfWork(sqlite_session_factory)
+    nu: datetime = datetime(2022, 4, 24, 0,0, 0, 0, tzinfo=timezone.utc)
     insert_recommendation(session, f"pizza", f"Betty-George", nu.isoformat(), f"http://example.com")
     uow.commit()
     uow = unitofwork.SqlAlchemyUnitOfWork(sqlite_session_factory)
@@ -56,16 +57,20 @@ def setRating(session,response):
         rec = uow.repo.get(0)
         rec.setRating(response)
 
-
-
 #this is messed up because i need to persist the rank for the user match instad of the recommendation. The rank doesn't change for every recommendation so it should not be given more reasons to change than it needs
-def get_ranking(session, uniqueUserMatchID):
-    [[recommendationrating]]=session.execute(
-        'SELECT Avg(_recommendationRating) FROM recommendations WHERE uniqueUserMatchID=:uniqueUserMatchID',
-        dict(uniqueUserMatchID=uniqueUserMatchID),
-    )
-    return recommendationrating
+# def get_ranking(session, uniqueUserMatchID):
+#     [[recommendationrating]]=session.execute(
+#         'SELECT _recommendationRating FROM recommendations WHERE uniqueUserMatchID=:uniqueUserMatchID',
+#         dict(uniqueUserMatchID=uniqueUserMatchID),
+#     )
+#     return recommendationrating
 
+def get_recommendation(session, reference):
+    [[itemID, findItem, uniqueUserMatchID]] = session.execute(
+        "SELECT itemID, findItem, uniqueUserMatchID FROM recommendations WHERE reference=:reference",
+        dict(reference=reference)
+    )
+    return itemID, findItem, uniqueUserMatchID
 
 def test_can_retrieve_recommendation(sqlite_session_factory):
     session = sqlite_session_factory()
@@ -94,12 +99,6 @@ def test_can_retrieve_userMatch(sqlite_session_factory):
         assert match.reference=="BettyGeorge"
 
     
-def get_recommendation(session, reference):
-    [[itemID]] = session.execute(
-        "SELECT itemID FROM recommendations WHERE reference=:reference",
-        dict(reference=reference)
-    )
-    return itemID
 
 def test_set_ranking_for_usermatch(sqlite_session_factory):
     session = sqlite_session_factory()
@@ -107,21 +106,20 @@ def test_set_ranking_for_usermatch(sqlite_session_factory):
     insert_userMatch(session,"betty","george")
     insert_userMatch(session, "betty","john")
     insert_recommendation(session, f"pizza",f"bettygeorge", nu.isoformat() ,f"getpizza.com", _recommendationRating=1) #because we have a passing set rating test() &we assume data has already been set
-    insert_recommendation(session,f"icecream",f"bettygeorge", nu.isoformat(), "geticecream.com",_recommendationRating=0)
-    insert_recommendation(session,"jello","bettygeorge", nu.isoformat(), f"getjello.com",  _recommendationRating=0)
-    insert_recommendation(session, "beer","bettyjohn", nu.isoformat(), f"getbeer.com",_recommendationRating=0)
+    insert_recommendation(session,f"icecream",f"bettygeorge", nu.isoformat(), f"geticecream.com",_recommendationRating=0)
+    insert_recommendation(session,f"jello",f"bettygeorge", nu.isoformat(), f"getjello.com",  _recommendationRating=0)
+    insert_recommendation(session, f"beer",f"bettyjohn", nu.isoformat(), f"getbeer.com",_recommendationRating=0)
     session.commit()
 
-    matches: MatchUsers = None
     uow = unitofwork.SqlAlchemyUnitOfWork(sqlite_session_factory)
 
     with uow:
-        match = uow.repo.get_match("bettygeorge")
+        match = uow.repo.select_for_update_match(reference="bettygeorge")
         recs = uow.repo.list_rated_recommendations()
         rank = setRank(recs,"bettygeorge")
         match.setRank(rank,"bettygeorge")
         uow.commit()
-        rank_sql = uow.repo.get_match("bettygeorge")
+        rank_sql = uow.repo.get_match(reference="bettygeorge")
         assert rank_sql._rank == 1/3
         
 
@@ -159,62 +157,37 @@ def test_select_for_update(sqlite_session_factory):
     rate = get_rating(session, 1)
     assert rate==0
 
-def test_get_rank(sqlite_session_factory):
+
+def test_return_list_by_rank(sqlite_session_factory):
     session = sqlite_session_factory()
     nu: datetime = datetime(2022, 4, 24, 0,0, 0, 0, tzinfo=timezone.utc)
     nu2: datetime = datetime(2022, 4, 25, 0,0, 0, 0, tzinfo=timezone.utc)
     nu3: datetime = datetime(2022, 4, 26, 0,0, 0, 0, tzinfo=timezone.utc)
     nu4: datetime = datetime(2022, 4, 27, 0,0, 0, 0, tzinfo=timezone.utc)
     insert_userMatch(session,"betty","george")
+    insert_userMatch(session,"betty","john")
     insert_recommendation(session, f"ice cream", f"bettygeorge", nu.isoformat(), f"http://example.com")
     insert_recommendation(session, f"pizza", f"bettygeorge", nu2.isoformat(), f"http://examplepizza.com")
-    insert_recommendation(session, f"cookies", f"bettygeorge", nu3.isoformat(), f"http://examplepizza.com")
-    insert_recommendation(session, f"beer", f"bettygeorge", nu4.isoformat(), f"http://examplepizza.com")
-
+    insert_recommendation(session, f"cookies", f"bettygeorge", nu2.isoformat(), f"http://examplepizza.com")
+    insert_recommendation(session, f"ice cream", f"bettyjohn", nu3.isoformat(), f"http://examplepizza.com")
+    insert_recommendation(session, f"beer", f"bettyjohn", nu4.isoformat(), f"http://examplepizza.com")
     session.commit()
 
     uow = unitofwork.SqlAlchemyUnitOfWork(sqlite_session_factory)
 
     with uow:
         retrieved = uow.repo.list_recommendations()
-        retrieved[0].setRating("bad")
         retrieved[1].setRating("good")
-        retrieved[2].setRating("good")
-        retrieved[3].setRating("good")
+        retrieved[2].setRating("bad")
+        retrieved[4].setRating("bad")
+        rated = uow.repo.list_rated_recommendations()
         rank = setRank(retrieved,"bettygeorge")
+        rate_George = uow.repo.select_for_update_match(reference="bettygeorge")
+        rate_George.setRank(rank,rate_George.reference)
+        rank2 = setRank(retrieved,"bettyjohn")
+        rate_John = uow.repo.select_for_update_match(reference="bettyjohn")
+        rate_John.setRank(rank2,rate_John.reference)
         uow.commit()
-        final_rank = get_ranking(session,f'bettygeorge')
-        retrieved_rating = get_rating(session, 1)
-
-        assert final_rank==0.75
-
-
-def return_list_by_rank(sqlite_session_factory):
-    session = sqlite_session_factory()
-    nu: datetime = datetime(2022, 4, 24, 0,0, 0, 0, tzinfo=timezone.utc)
-    nu2: datetime = datetime(2022, 4, 25, 0,0, 0, 0, tzinfo=timezone.utc)
-    nu3: datetime = datetime(2022, 4, 26, 0,0, 0, 0, tzinfo=timezone.utc)
-    nu4: datetime = datetime(2022, 4, 27, 0,0, 0, 0, tzinfo=timezone.utc)
-    insert_recommendation(session, f"ice cream", f"BettyGeorge", nu.isoformat(), f"http://example.com")
-    insert_recommendation(session, f"pizza", f"BettyGeorge", nu2.isoformat(), f"http://examplepizza.com")
-    insert_recommendation(session, f"cookies", f"BettyJohn", nu3.isoformat(), f"http://examplepizza.com")
-    insert_recommendation(session, f"beer", f"BettyGeorge", nu4.isoformat(), f"http://examplepizza.com")
-    session.commit()
-
-    uow = unitofwork.SqlAlchemyUnitOfWork(sqlite_session_factory)
-
-    with uow:
-        retrieved = uow.repo.list_recommendations()
-        retrieved[0].setRating("bad")
-        retrieved[1].setRating("good")
-        retrieved[2].setRating("good")
-        retrieved[3].setRating("good")
-        rank = setRank(retrieved,"BettyGeorge")
-        rate_George = uow.repo.get_match("BettyGeorge")
-        rate_George.setRank(rank,rate_George.uniqueUserMatchID)
-        rate_John = uow.repo.get_match("BettyJohn")
-        rate_John.setRank(rank,rate_John.uniqueUserMatchID)
-        uow.commit()
-        assert rate_George._rank==0.75
-        assert rate_John._rank==1
-
+        ranked_recommenders = uow.repo.list_ordered_ranked_recommendations("ice cream")
+        expected = [get_recommendation(session, 1),get_recommendation(session, 4)]
+        assert ranked_recommenders==expected

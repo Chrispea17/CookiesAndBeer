@@ -3,7 +3,7 @@ import abc
 from recommendations import MatchUsers, Recommendation
 # import recommendations
 import orm
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
 
 """
@@ -44,7 +44,10 @@ class AbstractRepository(ABC):
          
     @abc.abstractmethod   
     def select_for_update_match(self, reference) -> MatchUsers:
-        return self.session.query(MatchUsers).filter(reference==reference).with_for_update().one()
+        raise NotImplementedError
+    @abc.abstractmethod   
+    def list_ordered_ranked_recommendations(self) -> MatchUsers:
+        raise NotImplementedError
 
 class SqlAlchemyRepository(AbstractRepository):
     def __init__(self, session):
@@ -63,6 +66,9 @@ class SqlAlchemyRepository(AbstractRepository):
     def list_rated_recommendations(self):
         return self.session.query(Recommendation).filter(Recommendation._recommendationRating!=None).all()
     
+    def list_ordered_ranked_recommendations(self,item) -> MatchUsers:
+        return self.session.query(Recommendation.itemID, Recommendation.findItem,Recommendation.uniqueUserMatchID).filter(Recommendation._recommendationRating==None).filter(Recommendation.itemID==item).order_by(desc(Recommendation._rank)).all()
+
     def select_for_update(self, reference) -> Recommendation:
         return self.session.query(Recommendation).filter(Recommendation.reference==reference).one()
     
@@ -76,14 +82,14 @@ class SqlAlchemyRepository(AbstractRepository):
         self.session.add(match)
         self.session.commit()
 
-    def get_match(self,matchid):
-        return next(b for b in self.session.query(MatchUsers) if b.reference==matchid)
+    def get_match(self,reference):
+        return self.session.query(MatchUsers).filter(MatchUsers.reference==reference).one()
 
     def list_matches(self):
         return self.session.query(MatchUsers).all()
 
     def select_for_update_match(self, reference) -> MatchUsers:
-        return self.session.query(MatchUsers).filter(reference==reference).with_for_update().one()
+        return self.session.query(MatchUsers).filter(MatchUsers.reference==reference).one()
 
 # class AbstractMatchRepository(ABC):
 #     # @abc.abstractmethod

@@ -4,6 +4,7 @@ from conftest import sqlite_session_factory
 from recommendations import *
 from services import setRating, sumRatings, setRank, countRecommendationsForMatch,getRecommendersForItem, getRankedRecommendations, add_recommendation
 from repository import AbstractRepository
+from sqlalchemy import desc
 import services
 import unitofwork
 
@@ -44,6 +45,9 @@ class FakeRepository(AbstractRepository):
 
     def list_rated_recommendations(self):
         return self.session.query(Recommendation).filter(Recommendation._recommendationRating!=None).all()
+    
+    def list_ordered_ranked_recommendations(self) -> MatchUsers:
+        return self.session.query(Recommendation).filter(Recommendation._recommendationRating!=None).order_by(desc(Recommendation._rank)).all()
 
 class FakeUnitOfWork(unitofwork.AbstractUnitOfWork):
     def __init__(self):
