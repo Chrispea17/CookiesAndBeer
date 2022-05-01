@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
-
+import messagebus
 import config
 import repository
 
@@ -22,10 +22,18 @@ class AbstractUnitOfWork(ABC):
     
     def commit(self):
         self._commit()
+        self.publish_events()
+
+    def publish_events(self):
+        for recommendation in self.repo.seen:
+            while recommendation.events:
+                event = recommendation.events.pop(0)
+                messagebus.handle(event)
 
     @abstractmethod
     def commit(self):
         raise NotImplementedError
+
 
     @abstractmethod
     def rollback(self):
@@ -34,11 +42,10 @@ class AbstractUnitOfWork(ABC):
 
 DEFAULT_SESSION_FACTORY = sessionmaker(
     bind=create_engine(
-        config.get_sqlite_file_url(),
+        config.get_sqlite_memory_uri(),
         isolation_level="SERIALIZABLE",
     )
 )
-
 
 class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
     def __init__(self, session_factory=DEFAULT_SESSION_FACTORY):
@@ -58,11 +65,3 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 
     def rollback(self):
         self.session.rollback()
-
-
-DEFAULT_SESSION_FACTORY = sessionmaker(
-    bind=create_engine(
-        config.get_sqlite_file_url(),
-        isolation_level="SERIALIZABLE",
-    )
-)

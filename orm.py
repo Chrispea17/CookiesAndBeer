@@ -22,10 +22,11 @@ def recommendation_list_endpoint():
 """
 
 from xmlrpc.client import DateTime
-from sqlalchemy import Table, Column, ForeignKey, Integer, String, Table, MetaData, Float, Date
+from sqlalchemy import Table, Column, ForeignKey, Integer, String, Table, MetaData, Float, Date, event
 from sqlalchemy.orm import relationship, mapper 
 from abc import *
 from recommendations import *
+import events
 
 metadata = MetaData()
 
@@ -68,3 +69,9 @@ def start_mappers():
     item_mapper = mapper(Item, items)
     recommendation_mapper = mapper(Recommendation, recommendations)
 
+"""
+TODO:test orm for events
+"""
+@event.listens_for(Recommendation, "load")
+def receive_load(recommendation, _):
+    recommendation.events = []

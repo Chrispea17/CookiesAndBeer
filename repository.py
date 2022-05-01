@@ -6,48 +6,19 @@ import orm
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
 
-"""
-With Chapter 06 instead of Barky
-"""
 class AbstractRepository(ABC):
+    def __init__(self):
+        self.seen = set()
+
     @abc.abstractmethod
     def add(self, recommendation: Recommendation):
+        self.seen.add(recommendation)
         raise NotImplementedError
 
     @abc.abstractmethod
     def get(self, reference) -> Recommendation:
         raise NotImplementedError
-    
-    @abc.abstractmethod
-    def list_recommendations(self):
-        raise NotImplementedError
-    
-    @abc.abstractmethod
-    def list_rated_recommendations(self):
-        raise NotImplementedError
 
-    @abc.abstractmethod
-    def select_for_update(self, reference)->Recommendation:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def add_match(self, match:MatchUsers):
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def get_match(self,matchid):
-        raise NotImplementedError
-        
-    @abc.abstractmethod
-    def list_matches(self):
-        raise NotImplementedError
-         
-    @abc.abstractmethod   
-    def select_for_update_match(self, reference) -> MatchUsers:
-        raise NotImplementedError
-    @abc.abstractmethod   
-    def list_ordered_ranked_recommendations(self) -> MatchUsers:
-        raise NotImplementedError
 
 class SqlAlchemyRepository(AbstractRepository):
     def __init__(self, session):
@@ -91,34 +62,3 @@ class SqlAlchemyRepository(AbstractRepository):
     def select_for_update_match(self, reference) -> MatchUsers:
         return self.session.query(MatchUsers).filter(MatchUsers.reference==reference).one()
 
-# class AbstractMatchRepository(ABC):
-#     # @abc.abstractmethod
-    # def add(self, match: MatchUsers):
-    #     raise NotImplementedError
-
-    # @abc.abstractmethod
-    # def get(self, reference) -> MatchUsers:
-    #     raise NotImplementedError
-    
-    # @abc.abstractmethod
-    # def select_for_update(self, reference)->MatchUsers:
-    #     raise NotImplementedError
-
-
-# class SqlAlchemyMatchRepository(AbstractMatchRepository):
-#     def __init__(self, session):
-#         self.session = session
-    
-#     def add(self, match):
-#         self.session.add(match)
-#         self.session.commit()
-    
-#     def get(self,reference):
-#         return self.session.query(MatchUsers).filter(MatchUsers.reference==reference)
-
-#     def list(self):
-#         return self.session.query(MatchUsers).all()
-    
-#     def select_for_update(self, reference) -> MatchUsers:
-#         return self.session.query(MatchUsers).filter(MatchUsers.reference==reference).one()
-    

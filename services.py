@@ -36,8 +36,7 @@ def setRating(response: str, recommendations, reference) -> int:
             return recs._recommendationRating
 
 # uow service 
-"""
-TODO:this is very wrong, need to save to match first then apply to rating"""
+
 def uow_setRating(response: str, reference, uow: AbstractUnitOfWork) -> int:
     with uow:
         rated_recommend = uow.repo.select_for_update(reference)

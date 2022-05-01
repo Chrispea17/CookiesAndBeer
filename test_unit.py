@@ -1,4 +1,5 @@
 from recommendations import Recommendation, MatchUsers, User, Item
+import events
 
 
 # from sqlalchemy.orm import mapper, relationship
@@ -54,11 +55,10 @@ def test_get_user_from_input():
 def test_item_user_from_input():
     item = Item("Cookies")
     assert isinstance(item, Item)
+    
+def test_records_rating_event():
+    recommendation = Recommendation(
+        "Jean-Joe", "cookies", "www.findyouritem.com","7-15-2022")
+    recommendation.setRating("bad")
+    assert recommendation.events[-1] == events.RatedRecommendation(item="cookies",findItem="www.findyouritem.com",_recommendationRating = 0)
 
-def test_set_rating_on_correct_recommendation():
-    recommendation1 = Recommendation(
-        "7-15-2022", "Jean-Joe", "cookies", "www.findyouritem.com")
-    recommendation2 = Recommendation(
-        "7-16-2022", "Jean-John", "cookies", "www.findyourcookie.com")
-    
-    

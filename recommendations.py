@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod, abstractproperty
 from sqlalchemy.ext.declarative import declarative_base
 from typing import List
+import events
 # Base = declarative_base()
 
 class SameRecommendations(Exception):
@@ -57,6 +58,7 @@ class Recommendation:
         self.findItem = url
         self._recommendationRating: int = rating
         self._rank = rank
+        self.events = []
 
     def __repr__(self):
         return f"Recommendation {self.reference}"
@@ -85,6 +87,8 @@ class Recommendation:
     def setRating(self, response: str) -> int:
         ratings = {"good": 1, "bad": 0}
         self._recommendationRating = ratings[response]
+        self.events.append(events.RatedRecommendation(self.findItem,self.itemID,self._recommendationRating))
+
     
 
 
@@ -108,15 +112,24 @@ class MatchUsers:
             self._rank = rank
     
 
-#My Aggregate
-class Suggestions:
-    def __init__(self, item: str, recommendations:List[Recommendation]):
-        self.item = item
-        self.recommendations = recommendations
+#My Aggregate which I'm not using or modifing now because I do not think it is worth the time. 
+# class Suggestions:
+#     def __init__(self, item: str, recommendations:List[Recommendation]):
+#         self.item = item
+#         self.recommendations = recommendations
 
-    def same_recommendation(self, item, finditem, otherrecommendation):
-        if self.item == otherrecommendation.item and self.findItem ==otherrecommendation.findItem:
-            raise NoSameRecommendations
+# def not_same_recommendation(self,recommendation: Recommendation, recommendations: List[Recommendation], item):
+#     return recommendation.findItem not in {r.findItem for r in recommendations if r.itemID==item}
 
+# def setRank(self,recommendations: List[Recommendation], matchid):
+#     count = 0
+#     sum = 0
+#     for recs in recommendations:
+#         if recs.uniqueUserMatchID==matchid and recs._recommendationRating is not None :
+#             count +=1
+#             sum+= recs._recommendationRating
+#     for recs in recommendations:
+#         recs._rank = sum/count
+#     return sum/count
 
 

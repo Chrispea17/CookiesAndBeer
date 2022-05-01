@@ -1,6 +1,4 @@
 from gettext import find
-from re import U
-import re
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, clear_mappers
@@ -36,7 +34,7 @@ def session(sqlite_session_factory):
 
 def wait_for_webapp_to_come_up():
     deadline = time.time() + 10
-    url = config.get_sqlite_file_url()
+    url = config.get_sqlite_memory_uri()
     while time.time() < deadline:
         try:
             return requests.get(url)
@@ -51,7 +49,7 @@ def restart_api():
     print(path)
     path.touch()
     time.sleep(0.5)
-    # wait_for_webapp_to_come_up()
+    wait_for_webapp_to_come_up()
 
 @pytest.fixture
 def add_ranking(session):
