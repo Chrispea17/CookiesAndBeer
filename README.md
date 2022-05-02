@@ -26,6 +26,7 @@ flask
      request
 dataclasses
      dataclass
+     asdict
  datetime 
      datetime
      date
@@ -42,4 +43,4 @@ setuptools
 abc 
      ABC
      abstractmethod
-
+logging

@@ -27,9 +27,10 @@ from sqlalchemy.orm import relationship, mapper
 from abc import *
 from recommendations import *
 import events
+import logging
 
 metadata = MetaData()
-
+logger = logging.getLogger(__name__)
 recommendations = Table(
     "recommendations", metadata,
     Column("reference", Integer, primary_key=True, autoincrement=True),

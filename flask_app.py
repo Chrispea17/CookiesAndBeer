@@ -9,6 +9,7 @@ import orm
 import services, unitofwork
 
 app = Flask(__name__)
+bus = bootstrap.bootstrap()
 orm.start_mappers()
 
 app.route("/submit_recommendation", methods=["POST"])
