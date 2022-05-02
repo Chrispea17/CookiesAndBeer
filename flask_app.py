@@ -4,8 +4,8 @@ from flask import Flask, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from allocation.domain import model
-from allocation.adapters import orm
+import recommendations
+import orm
 import services, unitofwork
 
 app = Flask(__name__)

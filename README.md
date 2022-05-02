@@ -6,3 +6,40 @@
 
 # CookiesAndBeer
 The design, creation, and testing of an app that introduces the idea of a decentralized >>buzz word<< recommendation engine. 
+
+This test needs the following python packages installed
+pytest
+sqlalchemy
+     create_engine
+     .orm 
+        sessionmaker,
+        clear_mappers
+        desc
+       .session
+            Session
+from pathlib 
+     Path
+time
+requests
+flask 
+     Flask
+     request
+dataclasses
+     dataclass
+ datetime 
+     datetime
+     date
+     timezone
+typing 
+     List 
+     Dict 
+     Callable 
+     Type
+__future__
+     annotations
+setuptools
+     setup
+abc 
+     ABC
+     abstractmethod
+

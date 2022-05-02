@@ -45,8 +45,6 @@ def uow_setRating(response: str, reference, uow: AbstractUnitOfWork) -> int:
         return rated_recommend._recommendationRating
 
 
-        
-
 def countRecommendationsForMatch(data: list[Recommendation], uniqueUserMatch):
     count = 0
     for item in data:
@@ -90,8 +88,7 @@ def setRank_uow(data: list[Recommendation], matchid, uow : AbstractUnitOfWork):
         uow.commit()
         return rank
 
-
-
+#this is a helper function
 def getRecommendersForItem(recs : list[Recommendation], matches : list[MatchUsers], ItemId):
     recommendersList = []
     for recommendation in recs:

@@ -1,5 +1,3 @@
-from multiprocessing.connection import wait
-import time
 from conftest import sqlite_session_factory
 from recommendations import *
 from services import setRating, sumRatings, setRank, countRecommendationsForMatch,getRecommendersForItem, getRankedRecommendations, add_recommendation

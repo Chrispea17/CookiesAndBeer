@@ -2,9 +2,7 @@ from abc import ABC, abstractmethod
 import abc
 from recommendations import MatchUsers, Recommendation
 # import recommendations
-import orm
 from sqlalchemy import create_engine, desc
-from sqlalchemy.orm import sessionmaker
 
 class AbstractRepository(ABC):
     def __init__(self):

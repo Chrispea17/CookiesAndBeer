@@ -2,14 +2,11 @@
 # from sqlalchemy import Column, ForeignKey, Integer, String, Table, MetaData
 # from sqlalchemy.ext.declarative import declarative_base
 # from sqlalchemy.orm import relationship, mapper
-import pytest
 from datetime import date
 from recommendations import Recommendation, MatchUsers
 import recommendations
-from sqlalchemy import insert, update
 from repository import SqlAlchemyRepository
 from services import setRating, setRank
-from sqlalchemy.orm import Session
 # pytestmark = pytest.mark.usefixtures('mappers')
 
 def test_repo_can_save_a_recommendation(session):
